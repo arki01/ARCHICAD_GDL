@@ -1,0 +1,72 @@
+
+!======================================================================================================
+!	창호 20 MVO
+!======================================================================================================
+!   DATE : 2017/10/25 WED
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	GUI
+!----------------------------------------------------------------------------------------------------
+
+	! UI Size
+	UI_max_width = 600
+	UI_max_height = 266
+	!  - Width : 444px
+	!  - Height : 296px
+
+	startX = 10
+	startY = 5
+	spaceY_title = 24			!	타이틀 간의 간격
+	spaceY_list = 22			!	항목간의 간격
+
+	separator_posY = 121		!	분리자 위치
+
+
+	ui_dialog	"2D/3D 표현 설정 (창호 20)"
+		ui_page	1
+
+		posX = startX
+		posY = startY
+		posX_list = startX+10
+
+
+			!	2D / 3D 표현 
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"2D / 3D 표현",	posX, posY	
+			posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"2D 상세 표현",	posX_list, posY
+				list_num = 4
+				ui_infield "iDetail_2d", posX_list+70, posY-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+							DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+							DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF], 
+							DETAIL_2D_MVO, stDetail_2d[DETAIL_2D_MVO]
+				posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"3D 상세 표현",	posX_list, posY
+				list_num = 4
+				ui_infield "iDetail_3d", posX_list+70, posY-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+							DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+							DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF], 
+							DETAIL_3D_MVO, stDetail_3d[DETAIL_3D_MVO]
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+

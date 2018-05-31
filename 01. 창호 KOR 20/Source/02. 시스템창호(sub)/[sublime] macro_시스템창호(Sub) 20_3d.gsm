@@ -1,0 +1,68 @@
+
+!======================================================================================================
+!	창호 20 (sub)
+!======================================================================================================
+!   DATE : 2017/8/18 FRI
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+define style "style_test_3d"	"맑은 고딕", 50, 1, 0
+set style	"style_test_3d"
+if	GLOB_VIEW_TYPE = 3	then
+  !	text		 0.001, 0, stMyname
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	형상
+!----------------------------------------------------------------------------------------------------
+rotx	-90
+addx	-mWidth/2
+
+	!	 Flip시에 프레임이 이동하지 않도록 
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		muly	-1
+	endif
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	call		"macro_프레임(시스템) 20.gsm"	parameters	all						bOrigin = bFrame_origin
+
+	!	샤시
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_num >= 1	then
+		addy	mSash_offset
+			for i = 1	to	iSash_num
+				if	mSash_size[i][W] > EPS & mSash_size[i][H] > EPS	then
+					add	mSash_pos[i][POSX], 0, mSash_pos[i][POSZ]
+						call		"macro_패널 20.gsm"	parameters	all		mSash_width = mSash_size[i][W],
+																			mSash_height = mSash_size[i][H],
+																			mDoor_width = mSash_size[i][W],
+																			mDoor_height = mSash_size[i][H],
+																			mDoor_thick = mDoor_thick,
+																			bOrigin = bSash_origin,
+																			iSash_idx = i,
+																			iPanel_type = iPanel_type_arr[i],
+																			iSash_category = iSash_type_arr[i][SASH_CATEGORY],
+																			iSash_type = iSash_type_arr[i][SASH_TYPE],
+																			iGlass_type = iGlass_type_arr[i],
+																			iDoor_type = iDoor_type_arr[i],
+																			iDoor_leaftype = iDoor_leaftype_arr[i]
+					del	1
+				endif
+			next i
+		del	1
+	endif
+
+del	1
+del	1

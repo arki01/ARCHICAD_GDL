@@ -1,0 +1,521 @@
+
+
+!======================================================================================================
+!	창호 20 (Main)
+!======================================================================================================
+!   DATE : 2017/10/20 FRI
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	GUI
+!----------------------------------------------------------------------------------------------------
+	!	Page 1. 창호 + 사이즈
+	!----------------------------------------------------------------------------------------------------
+	ui_page	iWindow_uipage, -1, "창호", "UImg_Tab_Window"
+	gosub	"UI_window_size"
+	gosub	"UI_window_size_image"
+
+	!	Page 2. 레이아웃 + 표현설정
+	!----------------------------------------------------------------------------------------------------
+	ui_page	iWindow_uipage+1, 1, "레이아웃/표현", "UImg_Tab_WindowRepresentation"
+	gosub	"UI_window_layout"
+	gosub	"UI_window_representation"
+
+	!	Page 3. 프레임
+	!----------------------------------------------------------------------------------------------------
+	call	"macro_프레임(시스템) 20.gsm"	parameters	all
+
+
+	!	Page 4. 패널
+	!----------------------------------------------------------------------------------------------------
+	call	"macro_패널 20.gsm"	parameters	all
+
+
+	!	Page 5. 마감
+	!----------------------------------------------------------------------------------------------------
+	call	"macro_마감 20.gsm"	parameters	all
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+!---------------------------------------------------------------------------------
+"UI_window"	:
+!---------------------------------------------------------------------------------
+
+
+	! UI Size
+	UI_max_width = 444
+	UI_max_height = 296
+	!  - Width : 444px
+	!  - Height : 296px
+
+	startX = 10
+	startY = 5
+	spaceY_title = 24			!	타이틀 간의 간격
+	spaceY_list = 22			!	항목간의 간격
+
+	separator_posY = 121		!	분리자 위치
+
+		ui_page	iWindow_uipage, -1, "창호", "UImg_Tab_Window"
+
+
+			!	창호 설정
+			!-----------------------------------------------------------------
+			posX = startX
+			posY = startY
+			posX_list = startX+10
+
+
+				!	사이즈
+				!-----------------------------------------------------------------
+				ui_style 	0,	1
+				ui_outfield	"전체 크기",	posX, posY	
+				posY = posY + spaceY_list
+
+					ui_style 	0,	0
+					ui_outfield	"너비(mm)",	posX_list, posY
+					ui_infield 	"mWidth", posX_list + 50, posY-4, 70, 20
+					ui_outfield	"높이(mm)",	posX_list + 50 + 80, posY
+					ui_infield 	"mHeight", posX_list + 50 + 80 + 50, posY-4, 70, 20							
+				
+				posY = posY + spaceY_title
+
+				!	레이아웃 
+				!-----------------------------------------------------------------
+				ui_style 	0,	1
+				ui_outfield	"레이아웃",	posX, posY	
+				posY = posY + spaceY_list
+
+					ui_style 	0,	0
+					ui_outfield	"분할 : ",	posX_list, posY
+
+						ui_outfield	"수직 열",	posX_list + 40, posY
+						ui_infield 	"iCol_divide_num", 	posX_list + 40 + 60, posY-4, 40, 20
+						ui_outfield	"수평 열",	posX_list + 40 + 60 + 50, posY
+						ui_infield 	"iRow_divide_num",		posX_list + 40 + 60 + 50 + 60, posY-4, 40, 20
+						strSash_num = str((iCol_num-1)*(iRow_num-1), 1, 0) + " 개 (" + str(iCol_num-1, 1, 0) + " X " + str(iRow_num-1, 1, 0) + ")"						
+						ui_outfield	"샤시 수 : " + strSash_num,	posX_list + 40 + 60 + 50 + 60 + 50 + 5, posY
+					posY = posY + spaceY_list
+
+					ui_style 	0,	0
+					ui_outfield	"병합 : ",	posX_list, posY
+						ui_outfield	"수직 열",	posX_list + 40, posY
+						ui_infield 	"iCol_combine_num", 	posX_list + 40 + 60, posY-4, 40, 20
+						ui_outfield	"수평 열",	posX_list + 40 + 60 + 50, posY
+						ui_infield 	"iRow_combine_num",		posX_list + 40 + 60 + 50 + 60, posY-4, 40, 20
+
+			ui_separator	startX, separator_posY, UI_max_width-startX, separator_posY
+			posY = separator_posY
+			posY = posY + 10
+
+
+			!	2D / 3D 표현 
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"2D / 3D 표현",	posX, posY	
+			posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"2D 상세 표현",	posX_list, posY
+				list_num = 4
+				ui_infield "iDetail_2d", posX_list+70, posY-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+							DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+							DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF], 
+							DETAIL_2D_MVO, stDetail_2d[DETAIL_2D_MVO]
+				posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"3D 상세",	posX_list, posY
+				list_num = 4
+				ui_infield "iDetail_3d", posX_list+70, posY-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+							DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+							DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF], 
+							DETAIL_3D_MVO, stDetail_3d[DETAIL_3D_MVO]
+			
+
+			ui_separator	UI_max_width/2, separator_posY+10, UI_max_width/2, UI_max_height-5
+			posY = separator_posY
+			posY = posY + 10
+
+			posX_2 = UI_max_width/2 + startX
+			posY_2 = separator_posY + 10
+			posX_list_2 = posX_2 + 10
+
+			!	열림선
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"열림선",	posX_2, posY_2		
+			posY_2 = posY_2 + spaceY_list		
+
+				ui_style 	0,	0
+				ui_outfield	"2D 열림 표현",	posX_list_2, posY_2
+				list_num = 3
+				ui_infield "iLine_show_2d", posX_list_2+70, posY_2-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							LINE_SHOW, stLine_show[LINE_SHOW], 
+							LINE_HIDE, stLine_show[LINE_HIDE], 
+							LINE_MVO, stLine_show[LINE_MVO]
+				posY_2 = posY_2 + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"3D 열림 표현",	posX_list_2, posY_2
+				list_num = 3
+				ui_infield "iLine_show_3d", posX_list_2+70, posY_2-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							LINE_SHOW, stLine_show[LINE_SHOW], 
+							LINE_HIDE, stLine_show[LINE_HIDE], 
+							LINE_MVO, stLine_show[LINE_MVO]
+
+return
+
+
+
+!---------------------------------------------------------------------------------
+"UI_window_size"	:
+!---------------------------------------------------------------------------------
+
+	! UI Size
+	UI_max_width = 444
+	UI_max_height = 296
+	!  - Width : 444px
+	!  - Height : 296px
+
+	startX = 10
+	startY = 5
+	spaceY_title = 24			!	타이틀 간의 간격
+	spaceY_list = 22			!	항목간의 간격
+
+	separator_posY = 121		!	분리자 위치
+
+
+
+	!	창호 설정
+	!-----------------------------------------------------------------
+	posX = startX
+	posY = startY
+	posX_list = startX+10
+
+
+		!	UI 전환
+		!-----------------------------------------------------------------
+		if	gs_ui_current_page = iWindow_uipage | gs_ui_current_page = 0 	then 
+			ui_pict_button	UI_NEXT, "", "UImg_Tab_WindowRepresentation", 410, posY-2, 26, 26, 0
+		endif
+		if	gs_ui_current_page = iWindow_uipage+1	then 
+			ui_pict_button	UI_PREV, "", "UImg_Tab_WindowSizes", 410, posY-2, 26, 26, 0
+		endif
+
+		!	사이즈
+		!-----------------------------------------------------------------
+		ui_style 	0,	1
+		ui_outfield	"전체 치수",	posX, posY	
+		posY = posY + spaceY_list
+
+			! ui_style 	0,	0
+			! ui_outfield	"너비(mm)",	posX_list, posY
+			! ui_infield 	"mWidth", posX_list + 50, posY-4, 70, 20
+			! ui_outfield	"높이(mm)",	posX_list + 50 + 75, posY
+			! ui_infield 	"mHeight", posX_list + 50 + 75 + 50, posY-4, 70, 20							
+
+			ui_style 	0,	0
+
+			_posX = posX_list
+			if	iDim = DIM1	then	
+				ui_style 	0,	1
+			else
+				ui_style 	0,	0
+			endif
+			ui_radiobutton "iDim", DIM1, "1. "+stDim[DIM1], _posX, posY-4, 100, 20		:	_posX = _posX + 110
+			ui_style 	0,	0
+			ui_outfield	"너비:",	_posX, posY										:	_posX = _posX + 30
+			ui_infield 	"mWidth_1", 	_posX, posY-4, 70, 20						:	_posX = _posX + 75
+			ui_outfield	"높이:",	_posX, posY										:	_posX = _posX + 30
+			ui_infield 	"mHeight_1", 	_posX, posY-4, 70, 20						:	_posX = _posX + 75
+			! ui_outfield	"깊이:",	_posX, posY										:	_posX = _posX + 30
+			! ui_infield 	"mDepth", 	_posX, posY-4, 70, 20				
+			posY = posY + spaceY_list
+
+			_posX = posX_list
+			if	iDim = DIM2	then	
+				ui_style 	0,	1
+			else
+				ui_style 	0,	0
+			endif
+			ui_radiobutton "iDim", DIM2, "2. "+stDim[DIM2], _posX, posY-4, 100, 20		:	_posX = _posX + 110
+			ui_style 	0,	0
+			ui_outfield	"너비:",	_posX, posY										:	_posX = _posX + 30
+			ui_infield 	"mWidth_2", 	_posX, posY-4, 70, 20						:	_posX = _posX + 75
+			ui_outfield	"높이:",	_posX, posY										:	_posX = _posX + 30
+			ui_infield 	"mHeight_2", 	_posX, posY-4, 70, 20
+			posY = posY + spaceY_list
+
+			_posX = posX_list
+			if	iDim = DIM3	then	
+				ui_style 	0,	1
+			else
+				ui_style 	0,	0
+			endif
+			ui_radiobutton "iDim", DIM3, "3. "+stDim[DIM3], _posX, posY-4, 100, 20		:	_posX = _posX + 110
+			ui_style 	0,	0
+			ui_outfield	"너비:",	_posX, posY										:	_posX = _posX + 30
+			ui_infield 	"mWidth_3", 	_posX, posY-4, 70, 20						:	_posX = _posX + 75
+			ui_outfield	"높이:",	_posX, posY										:	_posX = _posX + 30
+			ui_infield 	"mHeight_3", 	_posX, posY-4, 70, 20
+			posY = posY + spaceY_list
+
+			_posX = posX_list+10
+			ui_style 	0,	0
+			ui_outfield	"└ 개구부-제작치수 거리:",	_posX, posY					:	_posX = _posX + 130
+			ui_infield 	"mDis", _posX, posY-4, 70, 20							:	_posX = _posX + 75	
+			ui_infield 	"bDis", _posX, posY, 15, 15								:	_posX = _posX + 15
+			ui_outfield	"일괄입력",	_posX, posY				
+
+
+return
+
+
+!---------------------------------------------------------------------------------
+"UI_window_size_image"	:
+!---------------------------------------------------------------------------------
+
+	!	이미지
+	!-----------------------------------------------------------------
+	!	가로 사이즈 입력
+	ui_pict "UImg_Window_Main_W.png", 22, 135, 223, 107, 1+2
+
+	if	iDim = DIM3	then	
+		ui_style 	0,	1
+	else
+		ui_style 	0,	0
+	endif
+	ui_outfield	"3",	130, 127	
+	! ui_style 	0,	0								
+	! ui_infield 	"mWidth_3", 	90+15, 123-5, 70, 20		
+	if	iDim = DIM2	then	
+		ui_style 	0,	1
+	else
+		ui_style 	0,	0
+	endif
+	ui_outfield	"2",	130, 153	
+	! ui_style 	0,	0								
+	! ui_infield 	"mWidth_2", 	90+15, 149-5, 70, 20	
+	if	iDim = DIM1	then	
+		ui_style 	0,	1
+	else
+		ui_style 	0,	0
+	endif
+	ui_outfield	"1",	130, 178	
+
+	ui_style 	0,	0								
+	if	iDim = DIM1	then	ui_infield 	"mWidth_1", 	110, 245, 70, 20		
+	if	iDim = DIM2	then	ui_infield 	"mWidth_2", 	110, 245, 70, 20	
+	if	iDim = DIM3	then	ui_infield 	"mWidth_3", 	110, 245, 70, 20	
+
+	if	bDis	then
+		ui_infield 	"mDis", 45, 245, 50, 20
+	else
+		ui_infield 	"mDis_L", 45, 245, 50, 20	
+	endif
+	ui_infield 	"mDis_R", 193, 245, 50, 20	
+
+	!	세로 사이즈 입력
+	ui_pict "UImg_Window_Main_H.png", 300, 124, 95, 138, 1+2
+
+	if	iDim = DIM1	then	
+		ui_style 	0,	1
+	else
+		ui_style 	0,	0
+	endif
+	ui_outfield	"1",	361-20, 187	
+	if	iDim = DIM2	then	
+		ui_style 	0,	1
+	else
+		ui_style 	0,	0
+	endif
+	ui_outfield	"2",	361, 187	
+	if	iDim = DIM3	then	
+		ui_style 	0,	1
+	else
+		ui_style 	0,	0
+	endif
+	ui_outfield	"3",	361+20, 187	
+
+	ui_style 	0,	0
+	if	iDim = DIM1	then	ui_infield 	"mHeight_1", 	354+20*2, 187-4, 65, 20			
+	if	iDim = DIM2	then	ui_infield 	"mHeight_2", 	354+20*2, 187-4, 65, 20		
+	if	iDim = DIM3	then	ui_infield 	"mHeight_3", 	354+20*2, 187-4, 65, 20			
+
+	ui_infield 	"mDis_T", 248, 136, 50, 20	
+	ui_infield 	"mDis_B", 248, 228, 50, 20	
+
+return
+
+
+
+!---------------------------------------------------------------------------------
+"UI_window_representation"	:
+!---------------------------------------------------------------------------------
+
+	ui_separator	startX, separator_posY, UI_max_width-startX, separator_posY
+	posY = separator_posY
+	posY = posY + 10
+
+
+	!	2D / 3D 표현 
+	!-----------------------------------------------------------------
+	ui_style 	0,	1
+	ui_outfield	"2D / 3D 표현",	posX, posY	
+	posY = posY + spaceY_list
+
+		ui_style 	0,	0
+		ui_outfield	"2D 상세 표현",	posX_list, posY
+		list_num = 4
+		ui_infield "iDetail_2d", posX_list+70, posY-3, 100, 20, 
+					8, "", list_num, 0, 
+					0, 0, 0, 0, 
+					DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+					DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+					DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF], 
+					DETAIL_2D_MVO, stDetail_2d[DETAIL_2D_MVO]
+		posY = posY + spaceY_list
+
+		ui_style 	0,	0
+		ui_outfield	"3D 상세",	posX_list, posY
+		list_num = 4
+		ui_infield "iDetail_3d", posX_list+70, posY-3, 100, 20, 
+					8, "", list_num, 0, 
+					0, 0, 0, 0, 
+					DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+					DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+					DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF], 
+					DETAIL_3D_MVO, stDetail_3d[DETAIL_3D_MVO]
+
+
+	ui_separator	UI_max_width/2, separator_posY+10, UI_max_width/2, UI_max_height-5
+	posY = separator_posY
+	posY = posY + 10
+
+	posX_2 = UI_max_width/2 + startX
+	posY_2 = separator_posY + 10
+	posX_list_2 = posX_2 + 10
+
+	!	열림선
+	!-----------------------------------------------------------------
+	ui_style 	0,	1
+	ui_outfield	"열림선",	posX_2, posY_2		
+	posY_2 = posY_2 + spaceY_list		
+
+		ui_style 	0,	0
+		ui_outfield	"2D 열림 표현",	posX_list_2, posY_2
+		list_num = 3
+		ui_infield "iLine_show_2d", posX_list_2+70, posY_2-3, 100, 20, 
+					8, "", list_num, 0, 
+					0, 0, 0, 0, 
+					LINE_SHOW, stLine_show[LINE_SHOW], 
+					LINE_HIDE, stLine_show[LINE_HIDE], 
+					LINE_MVO, stLine_show[LINE_MVO]
+		posY_2 = posY_2 + spaceY_list
+
+		ui_style 	0,	0
+		ui_outfield	"3D 열림 표현",	posX_list_2, posY_2
+		list_num = 3
+		ui_infield "iLine_show_3d", posX_list_2+70, posY_2-3, 100, 20, 
+					8, "", list_num, 0, 
+					0, 0, 0, 0, 
+					LINE_SHOW, stLine_show[LINE_SHOW], 
+					LINE_HIDE, stLine_show[LINE_HIDE], 
+					LINE_MVO, stLine_show[LINE_MVO]
+
+
+return
+
+
+!---------------------------------------------------------------------------------
+"UI_window_layout"	:
+!---------------------------------------------------------------------------------
+
+
+
+	! UI Size
+	UI_max_width = 444
+	UI_max_height = 296
+	!  - Width : 444px
+	!  - Height : 296px
+
+	startX = 10
+	startY = 5
+	spaceY_title = 24			!	타이틀 간의 간격
+	spaceY_list = 22			!	항목간의 간격
+
+	separator_posY = 121		!	분리자 위치
+
+
+
+	!	창호 설정
+	!-----------------------------------------------------------------
+	posX = startX
+	posY = startY
+	posX_list = startX+10
+
+
+		!	UI 전환
+		!-----------------------------------------------------------------
+		if	gs_ui_current_page = iWindow_uipage | gs_ui_current_page = 0 	then 
+			ui_pict_button	UI_NEXT, "", "UImg_Tab_WindowRepresentation", 410, posY-2, 26, 26, 0
+		endif
+		if	gs_ui_current_page = iWindow_uipage+1	then 
+			ui_pict_button	UI_PREV, "", "UImg_Tab_WindowSizes", 410, posY-2, 26, 26, 0
+		endif
+
+		!	레이아웃 
+		!-----------------------------------------------------------------
+		ui_style 	0,	1
+		ui_outfield	"레이아웃",	posX, posY	
+		posY = posY + spaceY_list
+
+			ui_style 	0,	0
+			ui_outfield	"분할 : ",	posX_list, posY
+
+				ui_outfield	"수직 열",	posX_list + 40, posY
+				ui_infield 	"iCol_divide_num", 	posX_list + 40 + 60, posY-4, 40, 20
+				ui_outfield	"수평 열",	posX_list + 40 + 60 + 50, posY
+				ui_infield 	"iRow_divide_num",		posX_list + 40 + 60 + 50 + 60, posY-4, 40, 20
+				strSash_num = str((iCol_num-1)*(iRow_num-1), 1, 0) + " 개 (" + str(iCol_num-1, 1, 0) + " X " + str(iRow_num-1, 1, 0) + ")"						
+				ui_outfield	"샤시 수 : " + strSash_num,	posX_list + 40 + 60 + 50 + 60 + 50 + 5, posY
+			posY = posY + spaceY_list
+
+			ui_style 	0,	0
+			ui_outfield	"병합 : ",	posX_list, posY
+				ui_outfield	"수직 열",	posX_list + 40, posY
+				ui_infield 	"iCol_combine_num", 	posX_list + 40 + 60, posY-4, 40, 20
+				ui_outfield	"수평 열",	posX_list + 40 + 60 + 50, posY
+				ui_infield 	"iRow_combine_num",		posX_list + 40 + 60 + 50 + 60, posY-4, 40, 20
+
+
+
+
+return

@@ -1,0 +1,150 @@
+
+!======================================================================================================
+!	창호 20 - 열림선
+!======================================================================================================
+!	DATE : 2017/10/27 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+unID = 1000
+
+define style "style_text_3d"	"맑은 고딕", 50, 5, 0
+set style	"style_text_3d"
+
+
+!----------------------------------------------------------------------------------------------------
+!	형상
+!----------------------------------------------------------------------------------------------------
+
+	!	핫스팟
+	!----------------------------------------------------------------------------------------------------
+	if	bTest	then
+		hotspot	0, 0, 0, 						unID	: unID = unID + 1
+		hotspot	mLine_width, 0, 0, 				unID	: unID = unID + 1	
+		hotspot	mLine_width, 0, mLine_height,	unID	: unID = unID + 1
+		hotspot	0, 0, mLine_height,				unID	: unID = unID + 1	
+	endif
+
+	!	라인
+	!----------------------------------------------------------------------------------------------------
+	!	여닫이(좌)
+	if	iLine_type = LINE_TURN_LEFT	then		
+		mLine_width_sub = mLine_width
+		mLine_height_sub = mLine_height	
+		gosub	"opening_line_projected"									
+	endif
+
+	!	여닫이(우)
+	if	iLine_type = LINE_TURN_RIGHT	then		
+		mLine_width_sub = mLine_width
+		mLine_height_sub = mLine_height
+		addx	mLine_width_sub
+			mulx	-1			
+				gosub	"opening_line_projected"		
+			del	1	
+		del	1						
+	endif
+
+	!	여닫이(상)
+	if	iLine_type = LINE_TURN_TOP	then		
+		mLine_width_sub = mLine_height
+		mLine_height_sub = mLine_width	
+		addx	mLine_width
+			roty	-90
+				gosub	"opening_line_projected"
+			del	1
+		del	1
+	endif
+
+	!	여닫이(하)
+	if	iLine_type = LINE_TURN_BOTTOM	then		
+		mLine_width_sub = mLine_height
+		mLine_height_sub = mLine_width	
+		addz	mLine_height
+			roty	90
+				gosub	"opening_line_projected"
+			del	1
+		del	1										
+	endif
+
+	!	미닫이(좌)
+	if	iLine_type = LINE_SLIDING_LEFT	then
+		mLine_width_sub = 0.1
+		add	mLine_width/2-mLine_width_sub/2, 0, mLine_height/2
+			gosub	"opening_line_sliding"
+		del	1
+	endif
+
+	!	미닫이(우)
+	if	iLine_type = LINE_SLIDING_RIGHT	then
+		mLine_width_sub = 0.1
+		add	mLine_width/2+mLine_width_sub/2, 0, mLine_height/2
+			mulx	-1
+				gosub	"opening_line_sliding"
+			del	1
+		del	1
+	endif
+
+	!	고정		
+	if	iLine_type = LINE_FIX	then	
+		add	mLine_width/2, 0, mLine_height/2
+			gosub	"text_fix"
+		del	1
+	endif
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+"opening_line_projected"	:
+
+	!	LEFT 기준
+	call	"macro_입면선 20.gsm"	parameters	all		symbol_index = iLine_shape_type,
+														pen_3d = iLine_pen,
+														elevPen = iLine_pen,
+														x_1 = mLine_width_sub,
+														z_1 = 0,
+														x_2 = 0,
+														z_2 = mLine_height_sub/2
+	call	"macro_입면선 20.gsm"	parameters	all		symbol_index = iLine_shape_type,
+														pen_3d = iLine_pen,
+														elevPen = iLine_pen,
+														x_1 = 0,
+														z_1 = mLine_height_sub/2,
+														x_2 = mLine_width_sub,
+														z_2 = mLine_height_sub		
+
+return
+
+
+"opening_line_sliding"	:
+
+	!	LEFT 기준
+	pen_3d = iLine_pen
+	lin_	0, 0, 0, mLine_width_sub, 0, 0
+	addx	mLine_width_sub
+		lin_	-mLine_width_sub*0.2, 0, mLine_width_sub*0.2, 0, 0, 0
+	del	1
+
+return
+
+
+"text_fix"	:
+	
+	if GLOB_VIEW_TYPE <> 3	then
+		rotx	90	
+			material iText_mat
+			text	0.001, 0, "FIX"
+		del	1
+	endif
+
+return
+
+

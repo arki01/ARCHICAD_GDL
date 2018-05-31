@@ -1,0 +1,119 @@
+
+!======================================================================================================
+!	창호 20 - 창호(sub)
+!======================================================================================================
+!	DATE : 2017/10/23 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	define style "style_test_2d"	"맑은 고딕", 1, 1, 0
+	set style	"style_test_2d"
+	! text2	0, 0, stMyname
+
+	text2	0, 0, "SYMB_ROTANGLE : " + str(SYMB_ROTANGLE, 1, 0)
+	text2	0, -0.1, "SYMB_MIRRORED : " + str(SYMB_MIRRORED, 1, 0)
+	text2	0, -0.2, "WIDO_REVEAL_SIDE : " + str(WIDO_REVEAL_SIDE, 1, 0)
+endif
+
+!	Setting Dialog 방향 바꿔줌 
+if	GLOB_CONTEXT = 5	then
+	if	WIDO_REVEAL_SIDE = 1 then mul2 -1, 1
+endif
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+	
+if	iFrame_setting = FRAME_SIZE_ONCE	then
+	mFrmW = mFrame_once_w
+	mFrmD = mFrame_once_d
+endif
+if	iFrame_setting = FRAME_SIZE_SEPERATE	then
+	mFrmW = mFrame_hori_w
+	mFrmD = mFrame_hori_d	
+endif	
+if	iFrame_setting = FRAME_SIZE_INOUT	then
+	mFrmW = mFrame_hori_w
+	mFrmD = mFrame_hori_d	
+endif	
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	창호
+!----------------------------------------------------------------------------------------------------
+add2	-mWidth/2, 0
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	!	 Flip시에 프레임이 이동하지 않도록 
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		mul2	1, -1
+	endif
+
+	call	"macro_프레임(시스템) 20.gsm"	parameters	all
+
+
+	!	샤시 / 도어
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_num >= 1	then
+		add2	0, mSash_offset
+			for idx = 1	to	iSash_num
+				if	mSash_size[idx][W] > EPS & mSash_size[idx][H] > EPS	then
+
+					if	abs(mSash_pos[idx][POSZ] - mFrmW) < EPS	| abs(mSash_pos[idx][POSZ]) < EPS 	then
+						add2		mSash_pos[idx][POSX], 0
+							call		"macro_패널 20.gsm"	parameters	all		mSash_width = mSash_size[idx][W],
+																				mSash_height = mSash_size[idx][H],
+																				mDoor_width = mSash_size[idx][W],
+																				mDoor_height = mSash_size[idx][H],
+																				mDoor_thick = mDoor_thick,
+																				bOrigin = bSash_origin,
+																				iSash_idx = idx,
+																				iPanel_type = iPanel_type_arr[idx],
+																				iSash_category = iSash_type_arr[idx][SASH_CATEGORY],
+																				iSash_type = iSash_type_arr[idx][SASH_TYPE],
+																				iGlass_type = iGlass_type_arr[idx],
+																				iDoor_type = iDoor_type_arr[idx],
+																				iDoor_leaftype = iDoor_leaftype_arr[idx]
+						del	1
+					endif
+
+				endif
+			next idx
+		del	1
+	endif
+
+
+	!	미닫이창 중심선
+	!----------------------------------------------------------------------------------------------------
+	if	iDetail_2d = DETAIL_2D_SIMPLE	then
+		add2	0, mFrmD/2
+			if	iSash_num >= 1	then
+				for idx = 1	to	iSash_num
+					if	iSash_type_arr[idx][SASH_TYPE] = TYPE_SLIDING	then
+						if	mSash_size[idx][W] > EPS & mSash_size[idx][H] > EPS	then
+	
+							if	abs(mSash_pos[idx][POSZ] - mFrmW) < EPS	then
+								add2		mSash_pos[idx][POSX] + mSash_size[idx][W]/2, 0
+									pen		iSash_cont_pen_hori
+									mLineL = mFrmD + 0.075*2
+									line2	0, -mLineL/2, 0, mLineL/2
+									hotline2	0, -mLineL/2, 0, mLineL/2, unID		: unID = unID + 1
+								del	1
+							endif
+	
+						endif
+					endif
+				next idx
+			endif
+		del	1
+	endif
+
+del	1

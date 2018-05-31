@@ -1,0 +1,225 @@
+
+!======================================================================================================
+!	패널 20
+!======================================================================================================
+!	DATE : 2017/10/19 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+EPS = 0.0001
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	타입 정의
+!----------------------------------------------------------------------------------------------------
+	!	샤시 / 도어 타입
+	!----------------------------------------------------------------------------------------------------
+	!	iPanel_type 인덱스
+	SASH_TYPE = 1
+	DOOR_TYPE = 2
+
+	dim	stPanel_type[]
+		stPanel_type[SASH_TYPE] = "샤시"
+		stPanel_type[DOOR_TYPE] = "도어"
+
+
+	!	샤시 
+	!----------------------------------------------------------------------------------------------------
+
+		!	샤시 배치 타입
+		!----------------------------------------------------------------------------------------------------
+		!	iSash_category 인덱스
+		CATEGORY_SINGLE = 1
+		CATEGORY_DOUBLE = 2
+		CATEGORY_TRIPLE = 3
+
+		dim	stSash_category[]
+			stSash_category[CATEGORY_SINGLE] = "단일창"
+			stSash_category[CATEGORY_DOUBLE] = "이중창"
+			stSash_category[CATEGORY_TRIPLE] = "삼중창"
+
+
+		!	iSash_type 인덱스
+		TYPE_FIXED = 1
+		TYPE_PROJECT_LEFT = 2
+		TYPE_PROJECT_RIGHT = 3
+		TYPE_PROJECT_TOP = 4
+		TYPE_PROJECT_BOTTOM = 5
+		TYPE_DOUBLE_PROJECT = 6
+		TYPE_SLIDING_2 = 7
+		TYPE_SLIDING_3 = 8
+		TYPE_PANEL_PROJECT = 9
+		TYPE_PANEL_SPANDREL = 10
+
+		dim	stSash_type[]
+			stSash_type[TYPE_FIXED] = "고정창"
+			stSash_type[TYPE_PROJECT_LEFT] = "여닫이창(좌)"
+			stSash_type[TYPE_PROJECT_RIGHT] = "여닫이창(우)"
+			stSash_type[TYPE_PROJECT_TOP] = "여닫이창(상)"
+			stSash_type[TYPE_PROJECT_BOTTOM] = "여닫이창(하)"
+			stSash_type[TYPE_DOUBLE_PROJECT] = "쌍여닫이창"	
+			stSash_type[TYPE_SLIDING_2] = "미닫이창(이중)"
+			stSash_type[TYPE_SLIDING_3] = "미닫이창(삼중)"
+			stSash_type[TYPE_PANEL_PROJECT] = "프로젝트창"
+			stSash_type[TYPE_PANEL_SPANDREL] = "스펜드럴"
+
+
+	!	도어
+	!----------------------------------------------------------------------------------------------------
+		!	도어 배치 타입
+		!----------------------------------------------------------------------------------------------------
+		!	iDoor_type 인덱스
+		TYPE_SINGLE_SWING = 1
+		TYPE_DOUBLE_SWING = 2
+		TYPE_SINGLE_SWING_180 = 3
+		TYPE_DOUBLE_SWING_180 = 4
+		TYPE_SINGLE_SLIDING = 5
+
+		TYPE_SINGLE_POCKET = 6
+		TYPE_DOUBLE_POCKET = 7
+		TYPE_PIVOT = 8
+		TYPE_FOLDING_ONEWAY = 9
+		TYPE_FOLDING_TWOWAY = 10
+		TYPE_ROTATE_4DIV = 11
+		TYPE_ROTATE_3DIV = 12
+		TYPE_ROTATE_2DIV = 13
+
+		dim	stDoor_type[]
+			stDoor_type[TYPE_SINGLE_SWING] = "여닫이문"
+			stDoor_type[TYPE_DOUBLE_SWING] = "쌍여닫이문"
+			stDoor_type[TYPE_SINGLE_SWING_180] = "여닫이문(180도)"
+			stDoor_type[TYPE_DOUBLE_SWING_180] = "쌍여닫이문(180도)"
+			stDoor_type[TYPE_SINGLE_SLIDING] = "미닫이문"
+
+			stDoor_type[TYPE_SINGLE_POCKET] = "미닫이문"
+			stDoor_type[TYPE_DOUBLE_POCKET] = "쌍미닫이문"
+			stDoor_type[TYPE_PIVOT] = "피벗도어"
+			stDoor_type[TYPE_FOLDING_ONEWAY] = "폴딩도어"	
+			stDoor_type[TYPE_FOLDING_TWOWAY] = "폴딩도어(양쪽)"
+			stDoor_type[TYPE_ROTATE_4DIV] = "회전문(4분할)"
+			stDoor_type[TYPE_ROTATE_3DIV] = "회전문(3분할)"	
+			stDoor_type[TYPE_ROTATE_2DIV] = "회전문(2분할)"
+
+
+		!	도어 패널 타입
+		!----------------------------------------------------------------------------------------------------
+		!	iDoor_leaftype	인덱스
+		DOORLEAF_GENERAL = 1
+		DOORLEAF_GLASS_2SIDE_FRAME = 2
+		DOORLEAF_GLASS_4SIDE_FRAME = 3
+
+
+		!	도어 방향 (2D)
+		!----------------------------------------------------------------------------------------------------
+		!	iDoor_dir 인덱스
+		LEFT_DOOR = 1
+		RIGHT_DOOR = 2
+		LEFT_DOOR_180 = 3
+		RIGHT_DOOR_180 = 4
+
+
+	!	열림선 타입
+	!----------------------------------------------------------------------------------------------------
+	!	iLine_shape_type 인덱스
+	SHAPE_DOTTED_LINE = 1						!	점선
+	SHAPE_DOTTED_POINT_LINE = 2					!	일점쇄선
+	SHAPE_SHORT_DOTTED_LINE = 3					!	도트선
+	SHAPE_REAL_LINE = 4							!	실선
+
+	!	iLine_type 인덱스
+	LINE_NONE = 1
+	LINE_TURN_LEFT = 2
+	LINE_TURN_RIGHT = 3
+	LINE_TURN_TOP = 4
+	LINE_TURN_BOTTOM = 5
+	LINE_SLIDING_LEFT = 6
+	LINE_SLIDING_RIGHT = 7
+	LINE_FIX = 8
+
+	!	'iLine_show_2d' , 'iLine_show_3d' 인덱스
+	LINE_SHOW = 1
+	LINE_HIDE = 2
+	LINE_MVO = 3
+
+	dim	stLine_show[]
+		stLine_show[LINE_SHOW] = "보이기"
+		stLine_show[LINE_HIDE] = "숨기기"
+		stLine_show[LINE_MVO] = "by MVO"
+
+
+
+	!	2D / 3D 표현
+	!----------------------------------------------------------------------------------------------------
+	!	'iDetail_2d' 인덱스
+	DETAIL_2D_SIMPLE = 1					
+	DETAIL_2D_DETAIL = 2					
+	DETAIL_2D_OFF = 3	
+	DETAIL_2D_MVO = 4
+
+	!	'iDetail_3d' 인덱스
+	DETAIL_3D_SIMPLE = 1					
+	DETAIL_3D_DETAIL = 2					
+	DETAIL_3D_OFF = 3	
+	DETAIL_3D_MVO = 4
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 연산
+!----------------------------------------------------------------------------------------------------
+
+!	이중창 활성화
+if	iSash_type = TYPE_FIXED | iSash_type = TYPE_SLIDING_2 | iSash_type = TYPE_SLIDING_3		then
+	bCategory_double = 1
+else
+	bCategory_double = 0
+endif
+
+
+!	플립 활성화
+bFlip = 0
+!if	abs(SYMB_ROTANGLE-180) < EPS & SYMB_MIRRORED = 1 & 	WIDO_REVEAL_SIDE = 0 \
+!	| abs(SYMB_ROTANGLE-180) < EPS & SYMB_MIRRORED = 1 & 	WIDO_REVEAL_SIDE = 1 then
+!	bFlip = 1
+!endif
+
+
+!	미닫이창 너비 세부설정
+if	bSash_width_set	then
+	if	iSash_type = TYPE_SLIDING_2	then
+		mSash_width_2 = mSash_width - mSash_width_1
+	endif
+	if	iSash_type = TYPE_SLIDING_3	then
+		mSash_width_3 = mSash_width - mSash_width_1 - mSash_width_2
+	endif	
+else
+	if	iSash_type = TYPE_SLIDING_2	then
+		mSash_width_1 = mSash_width/2
+		mSash_width_2 = mSash_width_1
+	endif
+	if	iSash_type = TYPE_SLIDING_3	then
+		mSash_width_1 = mSash_width/3
+		mSash_width_2 = mSash_width_1
+		mSash_width_3 = mSash_width_1
+	endif	
+endif
+
+
+!	방충망 사이즈
+_mNet_frame_w = mSash_frame_w
+_mNet_frame_d = mSash_frame_d/2
+if	not(bSash_dir)	then
+	_mNet_w = mSash_width_1 + _mNet_frame_w/2
+	_mNet_w_1 = mSash_width_1 + _mNet_frame_w/2
+	_mNet_w_2 = mSash_width_2 + _mNet_frame_w/2
+else
+	_mNet_w = mSash_width - mSash_width_1 + _mNet_frame_w/2
+	_mNet_w_1 = mSash_width - mSash_width_1 - mSash_width_2 + _mNet_frame_w
+endif
+_mNet_h = mSash_height

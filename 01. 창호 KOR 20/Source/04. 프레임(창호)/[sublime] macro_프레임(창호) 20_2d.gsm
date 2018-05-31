@@ -1,0 +1,159 @@
+
+!======================================================================================================
+!	창호 20 - 프레임(창호)
+!======================================================================================================
+!	DATE : 2018/2/7 WED
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+define style "style_test_2d"	"맑은 고딕", 1, 2, 0
+set style	"style_test_2d"
+
+if	bTest then
+	! project2	3, 270, 2
+
+	! text2	0, 0, stMyname
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+unID = 200
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	2D 심볼
+!----------------------------------------------------------------------------------------------------
+
+	!	단순 표현
+	!----------------------------------------------------------------------------------------------------
+	if	iDetail_2d = DETAIL_2D_SIMPLE | iDetail_2d = DETAIL_2D_DETAIL	then
+
+		!	핫스팟
+		!----------------------------------------------------------------------------------------------------
+		if	bTest	then
+			hotspot2 	0, 	0, 			unID		: unID = unID + 1			
+			hotspot2 	mWidth, 	0,	unID		: unID = unID + 1	
+
+			add2	0, mDepth
+				hotspot2 	0, 	0, 			unID		: unID = unID + 1			
+				hotspot2 	mWidth, 	0,	unID		: unID = unID + 1	
+			del	1
+		endif
+
+		!	핫라인
+		!----------------------------------------------------------------------------------------------------
+		hotline2	0, 		0, 		mWidth, 0, 		unID		: unID = unID + 1
+		hotline2	mWidth, 0,		mWidth, mDepth, unID		: unID = unID + 1	
+		hotline2	mWidth, mDepth, 0, mDepth, 		unID		: unID = unID + 1	
+		hotline2	0, 		mDepth, 0, 0, 			unID		: unID = unID + 1		
+
+
+		!	프레임
+		!----------------------------------------------------------------------------------------------------
+		!	수직 프레임 
+		if	iFrame_setting = FRAME_SIZE_ONCE	then
+			_mFrmW = mFrame_w
+			_mFrmD = mFrame_d
+		endif
+		if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+			_mFrmW = mFrame_vert_w
+			_mFrmD = mFrame_vert_d
+		endif
+		gosub	"frame_shape_vert"
+		add2	mWidth, 0
+		mul2	-1, 1
+			gosub	"frame_shape_vert"
+		del	2
+
+		!	수평 프레임 
+		if	iFrame_setting = FRAME_SIZE_ONCE	then
+			_mFrmW = mFrame_w
+			_mFrmD = mFrame_d
+			_mFrm_offsetx = mFrame_w			
+		endif
+		if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+			_mFrmW = mFrame_hori_w
+			_mFrmD = mFrame_hori_d
+			_mFrm_offsetx = mFrame_vert_w
+		endif		
+		gosub	"frame_shape_hori"
+
+
+	endif
+
+
+	!	상세 표현
+	!----------------------------------------------------------------------------------------------------
+	! if	iDetail_2d = DETAIL_2D_DETAIL	then
+
+	! 	add2	mWidth/2, 0
+	! 		text2	0, 0, "상세표현 개발 예정"
+	! 	del	1
+
+	! 	!	핫스팟
+	! 	!----------------------------------------------------------------------------------------------------
+		
+
+	! 	!	무빙 핫스팟
+	! 	!----------------------------------------------------------------------------------------------------
+
+
+	! 	!	프레임
+	! 	!----------------------------------------------------------------------------------------------------
+
+	! endif
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+
+
+"frame_shape_vert"	:
+
+	put 0, 0, 1,
+		_mFrmW, 0, 1,
+		_mFrmW, _mFrmD, 1,
+		0, _mFrmD, 1,
+		0, 0, 1
+
+	pen	iFrame_cont_pen
+	fill iFrame_fill						
+	si = 1+2+4+8+16
+	poly2_b{2}		nsp/3, si, iFrame_fill_pen, iFrame_back_pen,
+					0, 0, 0,
+					get(nsp)
+
+return
+
+
+
+"frame_shape_hori"	:
+
+	put _mFrm_offsetx, 0, 1,
+		mWidth-_mFrm_offsetx, 0, 1,
+		mWidth-_mFrm_offsetx, _mFrmD, 1,
+		_mFrm_offsetx, _mFrmD, 1,
+		_mFrm_offsetx, 0, 1
+
+	pen	iFrame_cont_pen
+	fill iFrame_fill						
+	si = 1+2+4+8+16
+	poly2_b{2}		nsp/3, si, iFrame_fill_pen, iFrame_back_pen,
+					0, 0, 0,
+					get(nsp)
+
+
+return

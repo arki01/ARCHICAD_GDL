@@ -1,0 +1,72 @@
+
+!======================================================================================================
+!	문 KOR 20
+!======================================================================================================
+!   DATE : 2018/01/23 FRI
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	창호
+!----------------------------------------------------------------------------------------------------
+rotx	-90
+
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	!	 Flip시에 프레임이 이동하지 않도록 
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		addy	-mDepth
+	endif
+	addx	-mWidth/2
+		call	"macro_프레임(도어) 20.gsm"	parameters	all
+	del	1
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		del	1
+	endif
+
+	!	패널
+	!----------------------------------------------------------------------------------------------------
+	_mSpace = 0.001		!	도어 이격공간
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		addy	-mDepth
+	endif
+	addx	-mDoor_width/2
+		rotz	0
+	addx	mDoor_width/2
+	add		-mDoor_width/2, mSash_offset, mFrame_bot_w1
+		add		_mSpace, 0, _mSpace
+		call	"macro_패널 20.gsm"	parameters	all		mDoor_width = mDoor_width - _mSpace*2,
+														mDoor_height = mDoor_height - _mSpace*2
+		del	1
+	del	1
+	del	3
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		del	1
+	endif
+
+del	1
+
+	!	마감
+	!----------------------------------------------------------------------------------------------------
+	call	"macro_마감 20.gsm"	parameters	all
+
+
+
+

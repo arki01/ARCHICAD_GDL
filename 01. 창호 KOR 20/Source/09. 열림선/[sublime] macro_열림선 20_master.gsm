@@ -1,0 +1,54 @@
+
+!======================================================================================================
+!	창호 20 - 열림선
+!======================================================================================================
+!	DATE : 2017/10/27 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+EPS = 0.0001
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	타입 정의
+!----------------------------------------------------------------------------------------------------
+
+!	iLine_shape_type 인덱스
+SHAPE_DOTTED_LINE = 1
+SHAPE_DOTTED_POINT_LINE = 2
+SHAPE_SHORT_DOTTED_LINE = 3
+SHAPE_REAL_LINE = 4
+
+dim	stLine_shape_type[]
+	stLine_shape_type[SHAPE_DOTTED_LINE] = "점선"
+	stLine_shape_type[SHAPE_DOTTED_POINT_LINE] = "일점쇄선"
+	stLine_shape_type[SHAPE_SHORT_DOTTED_LINE] = "도트선"
+	stLine_shape_type[SHAPE_REAL_LINE] = "실선"
+
+
+!	iLine_type 인덱스
+LINE_NONE = 1
+LINE_TURN_LEFT = 2
+LINE_TURN_RIGHT = 3
+LINE_TURN_TOP = 4
+LINE_TURN_BOTTOM = 5
+LINE_SLIDING_LEFT = 6
+LINE_SLIDING_RIGHT = 7
+LINE_FIX = 8
+
+dim	stLine_type[]
+	stLine_type[LINE_NONE] = "없음"
+	stLine_type[LINE_TURN_LEFT] = "여닫이(좌)"
+	stLine_type[LINE_TURN_RIGHT] = "여닫이(우)"
+	stLine_type[LINE_TURN_TOP] = "여닫이(상)"
+	stLine_type[LINE_TURN_BOTTOM] = "여닫이(하)"
+	stLine_type[LINE_SLIDING_LEFT] = "미닫이(좌)"
+	stLine_type[LINE_SLIDING_RIGHT] = "미닫이(우)"
+	stLine_type[LINE_FIX] = "고정"
+
+

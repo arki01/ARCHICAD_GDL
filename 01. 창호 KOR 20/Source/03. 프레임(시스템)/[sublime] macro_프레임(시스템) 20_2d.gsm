@@ -1,0 +1,250 @@
+
+!======================================================================================================
+!	창호 20 - 프레임
+!======================================================================================================
+!	DATE : 2017/8/18 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+define style "style_test_2d"	"맑은 고딕", 1, 2, 0
+set style	"style_test_2d"
+
+if	bTest then
+	!	project2	3, 270, 2
+
+	! text2	0, 0, stMyname
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+unID = 200
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	2D 심볼
+!----------------------------------------------------------------------------------------------------
+
+	!	연산
+	!----------------------------------------------------------------------------------------------------
+	dim	frame_vert_2d_idx[]						!	2D에 표현되는 수직 프레임 인덱스
+	dim bCol_hide[]								!	2D에 표현되는 수직 프레임 삭제 여부
+	frame_vert_2d_num = 0						!	2D에 표현되는 수직 프레임 갯수
+	gosub	"frame_vert_calc"					!	2D에 표현되는 수직 프레임 갯수 / 인덱스 정리
+
+
+	!	단순 표현
+	!----------------------------------------------------------------------------------------------------
+	if	iDetail_2d = DETAIL_2D_SIMPLE | iDetail_2d = DETAIL_2D_DETAIL	then
+
+		!	핫스팟
+		!----------------------------------------------------------------------------------------------------
+		if	bTest	then
+			hotspot2 	0, 	0, 			unID		: unID = unID + 1			
+			hotspot2 	mWidth, 	0,	unID		: unID = unID + 1	
+	
+			if	iFrame_setting = FRAME_SIZE_ONCE		then	add2	0, mFrame_once_d
+			if	iFrame_setting = FRAME_SIZE_VERTHORI	then	add2	0, mFrame_vert_d
+			if	iFrame_setting = FRAME_SIZE_INOUT		then	add2	0, mFrame_vert_d
+				hotspot2 	0, 	0, 			unID		: unID = unID + 1			
+				hotspot2 	mWidth, 	0,	unID		: unID = unID + 1	
+			del	1
+		endif
+
+		!	무빙 핫스팟
+		!----------------------------------------------------------------------------------------------------
+		for idx = 1	to	iCol_num
+			if	not(bCol_hide[idx])	then
+				if	(idx > 1) & (idx < iCol_num)	then
+					hotspot2 	0, 					0, 	unID, mCol_dist[idx], 1 + 128		: unID = unID + 1			
+					hotspot2 	mCol_dist[idx], 	0, 	unID, mCol_dist[idx], 2				: unID = unID + 1		
+					hotspot2 	-1, 				0, 	unID, mCol_dist[idx], 3				: unID = unID + 1		
+				endif
+			endif
+			add2	mCol_dist[idx], 0
+		next idx
+		del	iCol_num
+
+
+
+		!	프레임
+		!----------------------------------------------------------------------------------------------------
+		!	최하단에 있는 프레임만 보이도록 한다.
+		!	추후 요청사항 있을시 추가 개발 할 것.
+		gosub	"frame_vert_2d"
+		gosub	"frame_hori_2d"
+
+	endif
+
+
+	!	상세 표현
+	!----------------------------------------------------------------------------------------------------
+	if	iDetail_2d = DETAIL_2D_DETAIL	then
+
+		! add2	mWidth/2, 0
+		! 	text2	0, 0, "상세표현 개발 예정"
+		! del	1
+
+		! !	핫스팟
+		! !----------------------------------------------------------------------------------------------------
+		
+
+		! !	무빙 핫스팟
+		! !----------------------------------------------------------------------------------------------------
+
+
+		! !	프레임
+		! !----------------------------------------------------------------------------------------------------
+
+	endif
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+"frame_vert_shape_2d"	:
+
+	if	bFrame_origin	then
+		hotspot2 0, 0
+	endif
+
+	put	-mFrmW_sub/2, 0, 1,
+		mFrmW_sub/2, 0, 1,
+		mFrmW_sub/2, mFrmD_sub, 1,
+		-mFrmW_sub/2, mFrmD_sub, 1,
+		-mFrmW_sub/2, 0, -1
+
+	pen	iFrame_cont_pen
+	fill iFrame_fill						
+	si = 1+2+4+8+16
+	poly2_b{2}		nsp/3, si, iFrame_fill_pen, iFrame_back_pen,
+					0, 0, 0,
+					get(nsp)
+
+	if	bFrame_idx	then
+		gosub	"frame_index_2d"
+	endif
+
+
+return
+
+
+"frame_hori_shape_2d"	:
+
+	if	bFrame_origin	then
+		hotspot2 0, 0
+	endif
+
+	put	0, 0, 1,
+		mFrmL_sub, 0, 1,
+		mFrmL_sub, mFrmD_sub, 1,
+		0, mFrmD_sub, 1,
+		0, 0, -1
+
+	pen	iFrame_cont_pen
+	fill iFrame_fill						
+	si = 1+2+4+8+16
+	poly2_b{2}		nsp/3, si, iFrame_fill_pen, iFrame_back_pen,
+					0, 0, 0,
+					get(nsp)
+
+	if	bFrame_idx	then
+		add2	mFrmL_sub/2, 0
+			gosub	"frame_index_2d"
+		del	1
+	endif
+
+return
+
+
+"frame_vert_2d"	:
+
+	for i = 1	to	frame_vert_2d_num
+		idx = frame_vert_2d_idx[i]
+		stFrm_idx = "V" + str(idx, 1, 0)
+		mFrmW_sub = mFrame_size_vert[idx][W]
+		mFrmD_sub = mFrame_size_vert[idx][D]
+		add2	mFrame_pos_vert[idx][POSX], 0
+			gosub	"frame_vert_shape_2d"
+		del	1
+	next i
+
+return
+
+
+"frame_hori_2d"	:
+
+	if	iFrame_setting = FRAME_SIZE_ONCE	then
+		mFrmW = mFrame_once_w
+	endif
+	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+		mFrmW = mFrame_hori_w
+	endif	
+	if	iFrame_setting = FRAME_SIZE_INOUT	then
+		mFrmW = mFrame_hori_w
+	endif
+
+	for idx = 1	to	iFrame_num_hori
+		if	mFrame_len_hori[idx] > EPS	then
+			if	mFrame_pos_hori[idx][POSZ] - mFrmW/2 < EPS	then
+				if	not(bFrame_hide_hori[idx])	then
+					stFrm_idx = "H" + str(idx, 1, 0)
+					mFrmD_sub = mFrame_size_hori[idx][D]
+					mFrmL_sub = mFrame_len_hori[idx]
+					add2	mFrame_pos_hori[idx][POSX], 0
+						gosub	"frame_hori_shape_2d"
+					del	1
+				endif
+			endif
+		endif
+	next idx
+
+return
+
+
+"frame_index_2d"	:
+	
+	if	GLOB_VIEW_TYPE = 2	then 
+		text2	0, 0, stFrm_idx
+	endif	
+
+return
+
+
+"frame_vert_calc"	:
+
+	!	2D에 표현되는 수직 프레임 갯수 / 인덱스 정리
+	num = 1
+	for idx = 1	to	iFrame_num_vert
+		if	mFrame_len_vert[idx] > EPS	then
+			if	mFrame_pos_vert[idx][POSZ] < EPS	then
+				if	not(bFrame_hide_vert[idx])	then
+					frame_vert_2d_idx[num] = idx
+					num = num+1
+				endif
+			endif
+		endif
+	next idx
+	frame_vert_2d_num = num-1
+
+	!	2D에 표현되는 수직 프레임 삭제 여부 연산
+	num = 1
+	for	idx = 1	to	iFrame_num_vert	step iRow_num-1
+		if	mFrame_pos_vert[idx][POSZ] < EPS	then
+			bCol_hide[num] = bFrame_hide_vert[idx]
+		endif
+		num = num+1
+	next idx
+
+return

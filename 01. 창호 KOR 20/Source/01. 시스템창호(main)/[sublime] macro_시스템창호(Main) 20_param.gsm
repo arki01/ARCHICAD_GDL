@@ -1,0 +1,521 @@
+
+!======================================================================================================
+!	창호 20 (Main)
+!======================================================================================================
+!   DATE : 2017/10/19 THU
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	
+endif
+
+!----------------------------------------------------------------------------------------------------
+!	변수값 입략
+!----------------------------------------------------------------------------------------------------
+parameters	iDetail_3d = iDetail_2d	
+parameters	mDepth = mDepth
+
+!----------------------------------------------------------------------------------------------------
+!	매크로 연동
+!----------------------------------------------------------------------------------------------------
+call	"macro_마감 20.gsm"					parameters	all
+call	"macro_프레임(시스템) 20.gsm"		parameters	all		bFrame_size_calc = _bFrame_size_calc
+call	"macro_패널 20.gsm"			parameters	all
+call	"macro_표현 20.gsm"			parameters	all
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 정의
+!----------------------------------------------------------------------------------------------------
+values{2}	"iLine_show_2d",
+			LINE_SHOW, stLine_show[LINE_SHOW],
+			LINE_HIDE, stLine_show[LINE_HIDE],
+			LINE_MVO, stLine_show[LINE_MVO]
+if	iLine_show_2d = LINE_MVO	then	
+	iLine_show_2d_temp = 0
+	success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iLine_show_2d", iLine_show_2d_temp)
+	iLine_show_2d = iLine_show_2d_temp
+endif
+
+values{2}	"iLine_show_3d",
+			LINE_SHOW, stLine_show[LINE_SHOW],
+			LINE_HIDE, stLine_show[LINE_HIDE],
+			LINE_MVO, stLine_show[LINE_MVO]
+if	iLine_show_3d = LINE_MVO	then	
+	iLine_show_3d_temp = 0
+	success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iLine_show_3d", iLine_show_3d_temp)
+	iLine_show_3d = iLine_show_3d_temp
+endif			
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 범위 정의
+!----------------------------------------------------------------------------------------------------				
+	!	샤시 
+	!----------------------------------------------------------------------------------------------------
+	values	"iSash_num"	range [1, ]
+
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 숨김/잠금
+!----------------------------------------------------------------------------------------------------				
+if	bSash_uniform	then
+	lock	"stSash_index"
+endif
+
+! lock	"mWidth", "mHeight"
+lock	"iDetail_2d", "iDetail_3d"
+lock	"A", "B", "mWidth", "mHeight", "mDepth"
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------
+	!	샤시 
+	!----------------------------------------------------------------------------------------------------
+	if	iFrame_setting = FRAME_SIZE_ONCE	then
+		mFrmW_hori = mFrame_once_w
+		mFrmW_vert = mFrame_once_w
+		mFrmW_hori_in = mFrame_once_w
+		mFrmW_vert_in = mFrame_once_w		
+	endif
+	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+		mFrmW_hori = mFrame_hori_w
+		mFrmW_vert = mFrame_vert_w
+		mFrmW_hori_in = mFrame_hori_w
+		mFrmW_vert_in = mFrame_vert_w		
+	endif	
+	if	iFrame_setting = FRAME_SIZE_INOUT	then
+		mFrmW_hori = mFrame_hori_w
+		mFrmW_vert = mFrame_vert_w
+		mFrmW_hori_in = mFrame_hori_w_in
+		mFrmW_vert_in = mFrame_vert_w_in		
+	endif	
+
+
+		!	샤시 분류/유형 인덱스 입력
+		!----------------------------------------------------------------------------------------------------
+			!	Initialize
+			!----------------------------------------------------------------------------------------------------
+			if	iSash_num <> iSash_num_temp	then
+				for i = 1	to	iSash_num_max
+					if	i <= iSash_num	then
+						iPanel_type_arr[i] = 1
+					else
+						iPanel_type_arr[i] = 0
+					endif			
+				next i		
+				parameters	iPanel_type_arr = iPanel_type_arr
+
+				for i = 1	to	iSash_num_max
+					if	i <= iSash_num	then
+						iSash_type_arr[i][SASH_CATEGORY] = 1
+						iSash_type_arr[i][SASH_TYPE] = 1
+					else
+						iSash_type_arr[i][SASH_CATEGORY] = 0
+						iSash_type_arr[i][SASH_TYPE] = 0	
+					endif					
+				next i
+				parameters	iSash_type_arr = iSash_type_arr
+
+				for i = 1	to	iSash_num_max
+					if	i <= iSash_num	then
+						iGlass_type_arr[i] = 1
+					else
+						iGlass_type_arr[i] = 0
+					endif					
+				next i
+				parameters	iGlass_type_arr = iGlass_type_arr		
+
+				for i = 1	to	iSash_num_max
+					if	i <= iSash_num	then
+						iDoor_type_arr[i] = 1
+					else
+						iDoor_type_arr[i] = 0
+					endif			
+				next i		
+				parameters	iDoor_type_arr = iDoor_type_arr
+
+				for i = 1	to	iSash_num_max
+					if	i <= iSash_num	then
+						iDoor_leaftype_arr[i] = 1
+					else
+						iDoor_leaftype_arr[i] = 0
+					endif			
+				next i		
+				parameters	iDoor_leaftype_arr = iDoor_leaftype_arr
+			endif
+
+			!	Get value
+			!----------------------------------------------------------------------------------------------------
+			!	인덱스 변경시 해당 인덱스 값 가져오기
+			if	GLOB_MODPAR_NAME = "stSash_index" | iSash_num <> iSash_num_temp	then
+				iPanel_type = iPanel_type_arr[iSash_index]
+				iSash_category = iSash_type_arr[iSash_index][SASH_CATEGORY]
+				iSash_type = iSash_type_arr[iSash_index][SASH_TYPE]
+				iGlass_type = iGlass_type_arr[iSash_index]
+				iDoor_type = iDoor_type_arr[iSash_index]
+				iDoor_leaftype = iDoor_leaftype_arr[iSash_index]
+				parameters	iPanel_type = iPanel_type
+				parameters	iSash_category = iSash_category
+				parameters	iSash_type = iSash_type
+				parameters	iGlass_type = iGlass_type
+				parameters	iDoor_type = iDoor_type
+				parameters	iDoor_leaftype = iDoor_leaftype
+			endif
+
+			!	Set value
+			!----------------------------------------------------------------------------------------------------
+				!	패널
+				!----------------------------------------------------------------------------------------------------		
+				!	도어 유형 변경시 배열에 값 입력하기 
+				if	GLOB_MODPAR_NAME = "iPanel_type"	then
+					iPanel_type_arr[iSash_index] = iPanel_type
+					parameters iPanel_type_arr[iSash_index] = iPanel_type_arr[iSash_index]
+				endif
+
+				!	샤시
+				!----------------------------------------------------------------------------------------------------			
+				!	샤시 카테고리 변경시 배열에 값 입력하기 
+				if	not(bSash_uniform)	then
+
+					if	GLOB_MODPAR_NAME = "iSash_category"	then
+						iSash_type_arr[iSash_index][SASH_CATEGORY] = iSash_category
+						parameters iSash_type_arr[iSash_index][SASH_CATEGORY] = iSash_type_arr[iSash_index][SASH_CATEGORY]
+					endif
+					!	샤시 유형 변경시 배열에 값 입력하기 
+					if	GLOB_MODPAR_NAME = "iSash_type"	then
+						iSash_type_arr[iSash_index][SASH_TYPE] = iSash_type
+						parameters iSash_type_arr[iSash_index][SASH_TYPE] = iSash_type_arr[iSash_index][SASH_TYPE]
+					endif
+					!	유리 유형 변경시 배열에 값 입력하기 
+					if	GLOB_MODPAR_NAME = "iGlass_type"	then
+						iGlass_type_arr[iSash_index] = iGlass_type
+						parameters iGlass_type_arr[iSash_index] = iGlass_type_arr[iSash_index]
+					endif
+
+					!	예외처리 : TYPE_FIXED, TYPE_SLIDING 를 제외하고는 이중창 불가능함 
+					if	not(iSash_type_arr[iSash_index][SASH_TYPE] = TYPE_FIXED | iSash_type_arr[iSash_index][SASH_TYPE] = TYPE_SLIDING) 	then
+						parameters iSash_type_arr[iSash_index][SASH_CATEGORY] = CATEGORY_SINGLE
+					endif
+
+				else
+
+					if	GLOB_MODPAR_NAME = "iSash_category" | GLOB_MODPAR_NAME = "bSash_uniform" 	then
+						for idx = 1	to	iSash_num
+							iSash_type_arr[idx][SASH_CATEGORY] = iSash_category
+							parameters iSash_type_arr[idx][SASH_CATEGORY] = iSash_category
+						next idx
+					endif
+					if	GLOB_MODPAR_NAME = "iSash_type" | GLOB_MODPAR_NAME = "bSash_uniform" 	then
+						for idx = 1	to	iSash_num
+							iSash_type_arr[idx][SASH_TYPE] = iSash_type
+							parameters iSash_type_arr[idx][SASH_TYPE] = iSash_type
+						next idx
+					endif
+					if	GLOB_MODPAR_NAME = "iGlass_type" | GLOB_MODPAR_NAME = "bSash_uniform" 	then
+						for idx = 1	to	iSash_num
+							iGlass_type_arr[idx] = iGlass_type
+							parameters iGlass_type_arr[idx] = iGlass_type
+						next idx
+					endif				
+
+				endif
+
+				!	도어
+				!----------------------------------------------------------------------------------------------------			
+				!	도어 유형 변경시 배열에 값 입력하기 
+				if	GLOB_MODPAR_NAME = "iDoor_type"	then
+					iDoor_type_arr[iSash_index] = iDoor_type
+					parameters iDoor_type_arr[iSash_index] = iDoor_type_arr[iSash_index]
+				endif
+				if	GLOB_MODPAR_NAME = "iDoor_leaftype"	then
+					iDoor_leaftype_arr[iSash_index] = iDoor_leaftype
+					parameters iDoor_leaftype_arr[iSash_index] = iDoor_leaftype_arr[iSash_index]
+				endif
+			parameters	iSash_num_temp = iSash_num
+
+
+
+		!	창호 연산 스위치
+		!----------------------------------------------------------------------------------------------------
+		! if	GLOB_MODPAR_NAME = "mFrame_once_w" | GLOB_MODPAR_NAME = "mFrame_once_d" \
+		! 	| GLOB_MODPAR_NAME = "mFrame_vert_w" | GLOB_MODPAR_NAME = "mFrame_vert_d" | GLOB_MODPAR_NAME = "mFrame_hori_w" | GLOB_MODPAR_NAME = "mFrame_hori_d" \
+		! 	| GLOB_MODPAR_NAME = "mFrame_vert_w_in" | GLOB_MODPAR_NAME = "mFrame_vert_d_in" | GLOB_MODPAR_NAME = "mFrame_hori_w_in" | GLOB_MODPAR_NAME = "mFrame_hori_d_in" \
+		! 	| GLOB_MODPAR_NAME = "iFrame_setting" \ 
+		! 	| GLOB_MODPAR_NAME = "A" | GLOB_MODPAR_NAME = "B" | GLOB_MODPAR_NAME = "mWidth" | GLOB_MODPAR_NAME = "mHeight" \
+		! 	| GLOB_MODPAR_NAME = "mCol_dist" | GLOB_MODPAR_NAME = "mRow_dist" \
+		! 	| GLOB_MODPAR_NAME = "bFrame_hide_vert" | GLOB_MODPAR_NAME = "bFrame_hide_hori"	\ 
+		! 	| GLOB_MODPAR_NAME = "iCol_num" | GLOB_MODPAR_NAME = "iRow_num"	\
+		! 	| GLOB_MODPAR_NAME = "iCol_divide_num" | GLOB_MODPAR_NAME = "iRow_divide_num"	\
+		! 	| GLOB_MODPAR_NAME = "iCol_combine_num" | GLOB_MODPAR_NAME = "iRow_combine_num"  \
+		! 	| GLOB_MODPAR_NAME = "iPanel_type" 	 then
+		! 	bSash_calc = 1
+		! else
+		! 	bSash_calc = bFrame_size_calc				!	프레임 사이즈 조정될 경우에도 샤시 계산
+		! endif
+
+		bSash_calc = 1									!	임시 (최적화 작업 필요)
+
+		!	창호 갯수 연산 (iSash_num), 샤시 위치 연산 (mSash_pos), 수직프레임 삭제여부 연산 (bSash_vertFrm_hide)
+		!----------------------------------------------------------------------------------------------------
+		if	bSash_calc	then		
+
+			idx = 1
+			n = 1									!	연산을 위한 임의 수
+			idx_vert = 1
+
+			dim	bSash_vertFrm_hide[]				!	수직프레임 삭제여부, 창호 인덱스 순서를 따른다.
+
+			for i = 1	to	iFrame_num_hori
+				if	n = 1	then
+					if	mFrame_len_hori[i] > EPS 	then
+						
+						!	근접한 수직 프레임이 삭제되어 있는지 확인 
+						if	abs(mFrame_pos_hori[i][POSZ] - mFrmW_hori/2) < EPS	then
+							mFrm_vert_posz = 0
+						else
+							mFrm_vert_posz = mFrame_pos_hori[i][POSZ]
+						endif
+						if	i <= iRow_num	then
+							mFrm_vert_posx = mFrame_pos_hori[i][POSX] - mFrmW_vert/2
+						else
+							mFrm_vert_posx = mFrame_pos_hori[i][POSX] - mFrmW_vert_in/2
+						endif
+												
+						for	ii = 1	to	iFrame_num_vert
+							if	abs(mFrame_pos_vert[ii][POSX]-mFrm_vert_posx) < EPS & abs(mFrame_pos_vert[ii][POSZ]-mFrm_vert_posz) < EPS 	then
+								idx_vert = ii
+								ii = iFrame_num_vert
+							endif
+						next ii
+
+						bSash_vertFrm_hide[idx] = bFrame_hide_vert[idx_vert]
+							
+						!	위치 및 인덱스 저장
+						if	not(bSash_vertFrm_hide[idx])	then
+							mSash_pos[idx][POSX] = mFrame_pos_hori[i][POSX]
+							mSash_pos[idx][POSZ] = mFrame_pos_hori[i][POSZ] + mFrame_size_hori[i][W]/2
+							iSash_hori_idx[idx] = i
+							idx = idx+1
+						endif
+
+					endif
+				else
+					if	n < iRow_num	then
+						if	not(bFrame_hide_hori[i]) & mFrame_len_hori[i] > EPS 	then
+							
+							!	근접한 수직 프레임이 삭제되어 있는지 확인 
+							if	abs(mFrame_pos_hori[i][POSZ] - mFrmW_hori/2) < EPS	then
+								mFrm_vert_posz = 0
+							else
+								mFrm_vert_posz = mFrame_pos_hori[i][POSZ]
+							endif
+							if	i <= iRow_num	then
+								mFrm_vert_posx = mFrame_pos_hori[i][POSX] - mFrmW_vert/2
+							else
+								mFrm_vert_posx = mFrame_pos_hori[i][POSX] - mFrmW_vert_in/2
+							endif
+													
+							for	ii = 1	to	iFrame_num_vert
+								if	abs(mFrame_pos_vert[ii][POSX]-mFrm_vert_posx) < EPS & abs(mFrame_pos_vert[ii][POSZ]-mFrm_vert_posz) < EPS 	then
+									idx_vert = ii
+									ii = iFrame_num_vert
+								endif
+							next ii
+
+							bSash_vertFrm_hide[idx] = bFrame_hide_vert[idx_vert]
+								
+							!	위치 및 인덱스 저장
+							if	not(bSash_vertFrm_hide[idx])	then
+								mSash_pos[idx][POSX] = mFrame_pos_hori[i][POSX]
+								mSash_pos[idx][POSZ] = mFrame_pos_hori[i][POSZ] + mFrame_size_hori[i][W]/2
+								iSash_hori_idx[idx] = i
+								idx = idx+1
+							endif
+
+						endif
+					endif
+				endif
+				if	n = iRow_num	then
+					n = 1
+				else
+					n = n+1
+				endif
+			next i
+			iSash_num = idx-1
+
+			parameters	mSash_pos = mSash_pos
+			parameters	iSash_num = iSash_num
+			parameters	iSash_hori_idx = iSash_hori_idx
+
+		endif
+
+		!	패널 사이즈 연산 (mSash_size)
+		!----------------------------------------------------------------------------------------------------
+		if	bSash_calc then
+			
+			!	샤시 너비 : 근접한 수직프레임으로부터 다음 수직프레임까지의 너비 차이 계산
+			!----------------------------------------------------------------------------------------------------
+			dim iSash_vert_idx[]					!	수직프레임 창호 인덱스
+			vertFrm_idx = iFrame_num_vert+1			!	수직프레임 창호 인덱스
+			vertFrm_idx_next = iFrame_num_vert+1	!	근접한 수직프레임 창호 인덱스
+
+			for	idx = 1	to	iSash_num			
+
+				!	근접한 수직 프레임 인덱스 확인이 삭제되어 있는지 확인 
+				mFrm_vert_posz = 0
+				mFrm_vert_posx = 0
+				if	abs(mSash_pos[idx][POSZ] - mFrmW_hori) < EPS	then
+					mFrm_vert_posz = 0
+				else
+					mFrm_vert_posz = mSash_pos[idx][POSZ] - mFrmW_hori_in/2 
+				endif
+				if	abs(mSash_pos[idx][POSX] - mFrmW_vert) < EPS	then
+					mFrm_vert_posx = mSash_pos[idx][POSX] - mFrmW_vert/2 
+				else
+					mFrm_vert_posx = mSash_pos[idx][POSX] - mFrmW_vert_in/2 
+				endif
+
+				for	num = 1	to	iFrame_num_vert
+					if	(abs(mFrame_pos_vert[num][POSX]-mFrm_vert_posx) < EPS) & (abs(mFrame_pos_vert[num][POSZ]-mFrm_vert_posz) < EPS) 	then
+						vertFrm_idx = num
+						num = iFrame_num_vert
+					endif				
+				next num
+
+				if	vertFrm_idx = iFrame_num_vert+1		then
+					parameters 	stError = str(idx,1,0)+"번째 샤시 수직프레임 탐색 오류"
+					idx = iSash_num
+				else
+					parameters 	stError = "오류 없음"
+				endif
+
+				!	근접한 두 수직프레임의 거리를 샤시 너비로 계산
+				vertFrm_idx_next = 0									!	다음 수직 프레임 인덱스
+				for	num = vertFrm_idx +(iRow_num-1)	to	iFrame_num_vert	step iRow_num-1
+					if	num <= iFrame_num_vert-(iRow_num-1) 	then
+						if	not(bFrame_hide_vert[num]) 	then
+							vertFrm_idx_next = num
+							num = iFrame_num_vert
+						endif
+					else
+						vertFrm_idx_next = iFrame_num_vert
+						num = iFrame_num_vert
+					endif
+				next num
+
+				mSash_size[idx][W] = 0
+				if	vertFrm_idx_next >= 1 & vertFrm_idx >= 1	then
+					if	vertFrm_idx <= (iRow_num-1) & vertFrm_idx_next > iFrame_num_vert-(iRow_num-1) 	then
+						!	샤시에 근접한 수직프레임이 외곽+외곽 프레임인 경우
+						mSash_size[idx][W] = mFrame_pos_vert[vertFrm_idx_next][POSX] - mFrame_pos_vert[vertFrm_idx][POSX] - mFrmW_vert/2 - mFrmW_vert/2  
+					else
+						if	vertFrm_idx > (iRow_num-1) & vertFrm_idx_next <= iFrame_num_vert-(iRow_num-1) 	then
+							!	샤시에 근접한 수직프레임이 외곽+내부 프레임인 경우
+							mSash_size[idx][W] = mFrame_pos_vert[vertFrm_idx_next][POSX] - mFrame_pos_vert[vertFrm_idx][POSX] - mFrmW_vert_in/2 - mFrmW_vert_in/2 
+						else
+							!	샤시에 근접한 수직프레임이 내부+내부 프레임인 경우
+							mSash_size[idx][W] = mFrame_pos_vert[vertFrm_idx_next][POSX] - mFrame_pos_vert[vertFrm_idx][POSX] - mFrmW_vert/2 - mFrmW_vert_in/2 
+						endif						
+					endif					
+				endif				
+
+				if	mSash_size[idx][W] < EPS	then
+					parameters 	stError = str(idx,1,0)+"번째 샤시 너비 사이즈 연산 오류"
+					idx = iSash_num
+				else
+					parameters 	stError = "오류 없음"
+				endif
+
+			next idx
+
+			!	샤시 높이 : 연결된 수평프레임으로부터 다음 수평프레임까지의 높이 차이 계산
+			!----------------------------------------------------------------------------------------------------
+			for idx = 1	to	iSash_num
+
+				idx_now = iSash_hori_idx[idx]
+				idx_next = idx_now + 1
+				if	abs(mFrame_pos_hori[idx_next][POSZ] + mFrame_size_hori[idx_next][W]/2 - mHeight) < EPS	then
+					idx_next = idx_now + 1
+				else
+					for num = idx_next	to	iFrame_num_hori
+						if	not(bFrame_hide_hori[num])	then
+							idx_next = num
+							num = iFrame_num_hori
+						endif
+					next num			
+				endif
+
+				mSash_size[idx][H]= 0
+				if	idx_now >= 1 & idx_next >= 1	then
+					mSash_size[idx][H] = mFrame_pos_hori[idx_next][POSZ] - mFrame_pos_hori[idx_now][POSZ] - mFrame_size_hori[idx_next][W]/2 - mFrame_size_hori[idx_now][W]/2
+				endif
+
+				if	mSash_size[idx][H] < EPS	then
+					parameters 	stError = str(i,1,0)+"번째 샤시 높이 사이즈 연산 오류"
+					idx = iSash_num
+				else
+					parameters 	stError = "오류 없음"
+				endif
+			next idx
+
+			parameters 	mSash_size = mSash_size
+
+		endif
+
+
+		! !	도어 연산
+		! !----------------------------------------------------------------------------------------------------
+		! bDoor_calc = bSash_calc 
+
+		! if	bDoor_calc	then
+
+		! 	for idx = 1	to	iSash_num
+
+		! 		if	iPanel_type_arr[idx] = DOOR_PANEL_TYPE	then
+		! 			iHori_idx = iSash_hori_idx[idx]			!	도어 아래에 있는 수평프레임 인덱스
+
+		! 			!	도어 하부 프레임 삭제 				
+		! 			bFrame_hide_hori[iHori_idx] = 1					!	해당 수평프레임을 삭제
+
+		! 			!	도어 패널 위치 수정
+		! 			mSash_pos[idx][POSZ] = mSash_pos[idx][POSZ] - mFrame_size_hori[iHori_idx][W]		
+							
+		! 			!	도어 패널 사이즈 수정 : 프레임이 삭제된 높이만큼 도어 크기가 커짐
+		! 			mSash_size[idx][H] = mSash_size[idx][H] + mFrame_size_hori[iHori_idx][W]
+		! 		endif
+
+		! 		if	iPanel_type_arr[idx] = SASH_PANEL_TYPE	then
+		! 			if	iPanel_type_arr[idx] <> iPanel_type_arr_temp[idx]	then
+		! 				iHori_idx = iSash_hori_idx[idx]			!	도어 아래에 있는 수평프레임 인덱스
+
+		! 				!	도어 하부 프레임 삭제 				
+		! 				bFrame_hide_hori[iHori_idx] = 0					!	해당 수평프레임을 다시 원복
+
+		! 				!	도어 패널 위치 수정
+		! 				mSash_pos[idx][POSZ] = mSash_pos[idx][POSZ] + mFrame_size_hori[iHori_idx][W]
+		
+								
+		! 				!	도어 패널 사이즈 수정 : 프레임이 삭제된 높이만큼 도어 크기가 커짐
+		! 				mSash_size[idx][H] = mSash_size[idx][H] - mFrame_size_hori[iHori_idx][W]	
+		! 			endif
+		! 		endif
+
+		! 	next idx
+				
+		! 	parameters	bFrame_hide_hori = bFrame_hide_hori
+		! 	parameters 	mSash_pos = mSash_pos
+		! 	parameters 	mSash_size = mSash_size
+
+		! endif
+	
+		! parameters	iPanel_type_arr_temp = iPanel_type_arr
+
+

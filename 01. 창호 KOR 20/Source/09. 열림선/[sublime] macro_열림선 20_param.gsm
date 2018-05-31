@@ -1,0 +1,35 @@
+
+!======================================================================================================
+!	창호 20 - 열림선
+!======================================================================================================
+!	DATE : 2017/10/27 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 정의
+!----------------------------------------------------------------------------------------------------
+
+	!	선 종류
+	!------------------------------------------------------------------------------------------------------
+	values{2}	"iLine_shape_type",
+				SHAPE_DOTTED_LINE, stLine_shape_type[SHAPE_DOTTED_LINE],
+				SHAPE_DOTTED_POINT_LINE, stLine_shape_type[SHAPE_DOTTED_POINT_LINE],
+				SHAPE_SHORT_DOTTED_LINE, stLine_shape_type[SHAPE_SHORT_DOTTED_LINE],
+				SHAPE_REAL_LINE, stLine_shape_type[SHAPE_REAL_LINE]
+
+
+	!	열림선 타입
+	!------------------------------------------------------------------------------------------------------
+	values{2}	"iLine_type",
+				LINE_NONE, stLine_type[LINE_NONE],
+				LINE_TURN_LEFT, stLine_type[LINE_TURN_LEFT],
+				LINE_TURN_RIGHT, stLine_type[LINE_TURN_RIGHT],
+				LINE_TURN_TOP, stLine_type[LINE_TURN_TOP],
+				LINE_TURN_BOTTOM, stLine_type[LINE_TURN_BOTTOM],
+				LINE_SLIDING_LEFT, stLine_type[LINE_SLIDING_LEFT],
+				LINE_SLIDING_RIGHT, stLine_type[LINE_SLIDING_RIGHT],
+				LINE_FIX, stLine_type[LINE_FIX]
+

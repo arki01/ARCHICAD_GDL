@@ -1,0 +1,1107 @@
+
+
+!======================================================================================================
+!	창호 20 - 마감
+!======================================================================================================
+!	DATE : 2017/8/31 THU
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest_closure	then
+
+	! mul2	1,-1
+	! 	add2	-mWidth/2, 0
+	! 	project2	7, 0, 2
+	! 	del	1
+	! del	1
+
+	define style "style_test_2d"	"맑은 고딕", 1, 1, 0
+	set style	"style_test_2d"
+
+	! for idx = 1	to	iFin_num
+	! 	text2	0, -idx/2, stFin_mat_arr[idx]
+	! next idx
+
+	!	치수
+	add2	-mWidth_1/2, -mWall_thk/2
+		line2	0, 0, 0, mWall_thk*2
+		hotline2	0, 0, 0, mWall_thk*2	
+		add2	-mDis_L/2, 0
+			line2	0, 0, 0, mWall_thk*2
+			hotline2	0, 0, 0, mWall_thk*2
+		del	1
+		add2	-mDis_L, 0
+			line2	0, 0, 0, mWall_thk*2
+			hotline2	0, 0, 0, mWall_thk*2
+		del	1		
+	del	1
+
+	add2	mWidth_1/2, -mWall_thk/2
+		line2	0, 0, 0, mWall_thk*2
+		hotline2	0, 0, 0, mWall_thk*2	
+		add2	mDis_R/2, 0
+			line2	0, 0, 0, mWall_thk*2
+			hotline2	0, 0, 0, mWall_thk*2
+		del	1
+		add2	mDis_R, 0
+			line2	0, 0, 0, mWall_thk*2
+			hotline2	0, 0, 0, mWall_thk*2
+		del	1			
+	del	1
+
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+unID = 200
+
+if	GLOB_CONTEXT = 5 | GLOB_CONTEXT = 6	then	end					!	사용자 설정 다이얼로그에서는 보이지 않도록
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	심볼
+!----------------------------------------------------------------------------------------------------
+!	Reveal Depth 에 반응하지 않도록 좌표 이동
+add2	0, -WIDO_SILL
+
+!	마감 방향 반전
+if	abs(SYMB_ROTANGLE-180) < EPS	then
+	mul2	1, -1
+endif
+
+!	마감 위치 변경
+if	(WIDO_REVEAL_SIDE = 1 & abs(SYMB_ROTANGLE-180) < EPS)	then
+	add2	0, -mWall_thk
+endif
+if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-0) < EPS)	then
+	add2	0, -mCore_thk-mFin_front_thk +mFin_end_thk
+endif
+if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS)	then
+	add2	0, -mFin_front_thk*2
+endif
+
+
+!	외벽 공제 따른 좌표 이동
+if	iDetail_2d = DETAIL_2D_SIMPLE | iDetail_2d = DETAIL_2D_OFF	then
+	if	iDim = DIM1 	then	add2	-mWidth_1/2, 0
+	if	iDim = DIM2 	then	add2	-mWidth_1/2 -mDis_L/2, 0
+	if	iDim = DIM3 	then	add2	-mWidth_1/2 -mDis_L, 0
+endif
+if	iDetail_2d = DETAIL_2D_DETAIL	then
+	add2	-mWidth_1/2 -mDis_L, 0
+endif
+
+!	치수별 스냅점(핫스팟) 표기  - 포스코A&C 요청
+if	iDetail_2d = DETAIL_2D_DETAIL	then
+		! hotspot2	0, 0
+		! circle2	0, 0, 0.05
+	
+	if	GLOB_VIEW_TYPE = 2	then 
+
+		!	핫스팟
+		hotspot2	0, 			0, 	unID		: unID = unID + 1	
+		hotspot2	mDis_L/2, 	0, 	unID		: unID = unID + 1	
+		hotspot2	mDis_L, 	0, 	unID		: unID = unID + 1	
+		add2	0, mWall_thk
+			hotspot2	0, 			0, 	unID		: unID = unID + 1	
+			hotspot2	mDis_L/2, 	0, 	unID		: unID = unID + 1	
+			hotspot2	mDis_L, 	0, 	unID		: unID = unID + 1	
+		del	1
+
+		add2	mWidth_3, 0
+			hotspot2	0, 			0, 	unID		: unID = unID + 1	
+			hotspot2	-mDis_R/2, 	0, 	unID		: unID = unID + 1	
+			hotspot2	-mDis_R, 	0, 	unID		: unID = unID + 1
+			add2	0, mWall_thk	
+				hotspot2	0, 			0, 	unID		: unID = unID + 1	
+				hotspot2	-mDis_R/2, 	0, 	unID		: unID = unID + 1	
+				hotspot2	-mDis_R, 	0, 	unID		: unID = unID + 1
+			del	1
+		del	1
+		! !	핫스팟
+		! hotspot2	mWidth_1/2, 	0, 	unID		: unID = unID + 1	
+		! hotspot2	-mWidth_1/2, 	0, 	unID		: unID = unID + 1	
+		! hotspot2	mWidth_2/2, 	0, 	unID		: unID = unID + 1	
+		! hotspot2	-mWidth_2/2, 	0, 	unID		: unID = unID + 1	
+		! hotspot2	mWidth_3/2, 	0, 	unID		: unID = unID + 1	
+		! hotspot2	-mWidth_3/2, 	0, 	unID		: unID = unID + 1	
+		! add2	0, mWall_thk
+		! 	hotspot2	mWidth_1/2, 	0, 	unID		: unID = unID + 1	
+		! 	hotspot2	-mWidth_1/2, 	0, 	unID		: unID = unID + 1	
+		! 	hotspot2	mWidth_2/2, 	0, 	unID		: unID = unID + 1	
+		! 	hotspot2	-mWidth_2/2, 	0, 	unID		: unID = unID + 1	
+		! 	hotspot2	mWidth_3/2, 	0, 	unID		: unID = unID + 1	
+		! 	hotspot2	-mWidth_3/2, 	0, 	unID		: unID = unID + 1	
+		! del	1		
+
+		! !	핫라인
+		! hotline2	mWidth_1/2, 0, mWidth_1/2, mWall_thk, 	unID		: unID = unID + 1	
+		! hotline2	mWidth_2/2, 0, mWidth_2/2, mWall_thk, 	unID		: unID = unID + 1	
+		! hotline2	mWidth_3/2, 0, mWidth_3/2, mWall_thk, 	unID		: unID = unID + 1	
+		! hotline2	-mWidth_1/2, 0, -mWidth_1/2, mWall_thk, 	unID		: unID = unID + 1	
+		! hotline2	-mWidth_2/2, 0, -mWidth_2/2, mWall_thk, 	unID		: unID = unID + 1	
+		! hotline2	-mWidth_3/2, 0, -mWidth_3/2, mWall_thk, 	unID		: unID = unID + 1										
+	endif
+	
+endif
+
+
+if	bClosure	then
+	
+		! 	테스트
+		!----------------------------------------------------------------------------------------------------
+		!	원점
+		if	bOrigin	then
+			gosub	"test_origin_2d"
+		endif
+
+		if	bTest_closure	then
+			!	윈도우
+			if	iDetail_2d = DETAIL_2D_DETAIL	then
+				add2	mDis_L, 0
+			endif			
+			add2	0, mFin_front_thk
+				gosub	"test_window_2d"
+			del	1	
+			if	iDetail_2d = DETAIL_2D_DETAIL	then
+				del	1
+			endif
+		endif
+
+		!	핫스팟
+		!----------------------------------------------------------------------------------------------------
+		if	GLOB_VIEW_TYPE = 2 & bTest_closure	then
+			if	iClosure_type = TYPE1 | iClosure_type = TYPE3	then
+
+				!	오프닝 
+				!----------------------------------------------------------------------------------------------------
+				add2	0, mFin_front_thk			
+					hotspot2	0, 0,				unID	: unID = unID + 1
+					hotspot2	mWidth_opening, 0,			unID	: unID = unID + 1	
+				del	1
+				add2	0, mWall_thk-mFin_end_thk
+					hotspot2	0, 0,				unID	: unID = unID + 1
+					hotspot2	mWidth_opening, 0,			unID	: unID = unID + 1
+				del	1
+
+				!	마감
+				!----------------------------------------------------------------------------------------------------
+				!	외부 마감
+				if	iClosure_num > EPS	then
+					add2	-mClosure_thk + mFin_front_thk_real + mClosure_offset, 0		 
+						hotspot2 	0, 	0, 	unID		: unID = unID + 1	
+					del	1
+					add2	mWidth_opening -(-mClosure_thk + mFin_front_thk_real + mClosure_offset), 0		 
+						hotspot2 	0, 	0, 	unID		: unID = unID + 1		
+					del	1	
+				else
+					hotspot2 	0, 		0, 	unID		: unID = unID + 1
+					hotspot2 	mWidth_opening, 0, 	unID		: unID = unID + 1
+				endif
+
+				!	내부 마감
+				if	iClosure_num_in > EPS	then
+					add2	0, mWall_thk
+						add2	-mClosure_thk + mFin_end_thk_real + mClosure_offset_in, 0		 
+							hotspot2 	0, 	0, 	unID		: unID = unID + 1	
+						del	1
+						add2	mWidth_opening -(-mClosure_thk + mFin_end_thk_real + mClosure_offset_in), 0		 
+							hotspot2 	0, 	0, 	unID		: unID = unID + 1		
+						del	1
+					del	1
+				else
+					add2	0, mWall_thk
+						hotspot2 	0, 		0, 	unID		: unID = unID + 1
+						hotspot2 	mWidth_opening, 0, 	unID		: unID = unID + 1	
+					del	1
+				endif
+
+			endif
+
+			if	iClosure_type = TYPE2	then
+				if	iClosure_num > EPS	then
+					add2	-mClosure_thk + mFin_front_thk_real + mClosure_offset, 0		 
+						hotspot2 	0, 	0, 	unID		: unID = unID + 1	
+					del	1
+					add2	mWidth_opening -(-mClosure_thk + mFin_front_thk_real + mClosure_offset), 0		 
+						hotspot2 	0, 	0, 	unID		: unID = unID + 1		
+					del	1	
+					add2	0, mWall_thk	
+						add2	-mClosure_thk + mFin_front_thk_real + mClosure_offset, 0		 
+							hotspot2 	0, 	0, 	unID		: unID = unID + 1	
+						del	1
+						add2	mWidth_opening -(-mClosure_thk + mFin_front_thk_real + mClosure_offset), 0		 
+							hotspot2 	0, 	0, 	unID		: unID = unID + 1		
+						del	1	
+					del	1
+				endif
+				if	iClosure_num_in > EPS	then
+					add2	-mClosure_thk + mFin_end_thk_real + mClosure_offset, 0		 
+						hotspot2 	0, 	0, 	unID		: unID = unID + 1	
+					del	1
+					add2	mWidth_opening -(-mClosure_thk + mFin_end_thk_real + mClosure_offset), 0		 
+						hotspot2 	0, 	0, 	unID		: unID = unID + 1		
+					del	1	
+					add2	0, mWall_thk	
+						add2	-mClosure_thk + mFin_end_thk_real + mClosure_offset, 0		 
+							hotspot2 	0, 	0, 	unID		: unID = unID + 1	
+						del	1
+						add2	mWidth_opening -(-mClosure_thk + mFin_end_thk_real + mClosure_offset), 0		 
+							hotspot2 	0, 	0, 	unID		: unID = unID + 1		
+						del	1	
+					del	1
+				endif			
+			endif
+		endif
+
+
+		!	개구부
+		!----------------------------------------------------------------------------------------------------
+		gosub	"walllhole_total_2d"
+
+
+		!	마감재
+		!----------------------------------------------------------------------------------------------------
+		!	외부 마감
+		if	iClosure_num >= 1	then	
+			gosub	"closure_out_2d"	
+		endif
+
+		!	내부 마감
+		if	iClosure_num_in >= 1	then	
+			gosub	"closure_in_2d"	
+		endif
+
+
+		!	마감 테두리 (입/단면)
+		!----------------------------------------------------------------------------------------------------
+		!	외곽 테두리 표현 
+
+	del	1
+
+else
+
+	!	개구부
+	!----------------------------------------------------------------------------------------------------
+	si = 1
+	put	0, 0, si,
+		mWidth_opening, 0, si,
+		mWidth_opening, mWall_thk, si,
+		0, mWall_thk, si
+
+	!	단일벽시에 (bClosure = 0) 개구부가 제대로 표현되지 않는 오류 수정
+	if	abs(SYMB_ROTANGLE) < EPS & WIDO_REVEAL_SIDE = 0	then
+		mul2	1, -1
+	endif
+
+	wallhole2	nsp/3, 2, 1, 1, 
+				0, 0, 0,
+				get(nsp)
+
+	if	GLOB_STRUCTURE_DISPLAY = 0 	then
+		!	Entire Model 일 경우에 표현
+		pen	WALL_VIEW_PEN
+		wallline2 0, 0, 0, mWall_thk
+		add2	mWidth_opening, 0
+			wallline2 0, 0, 0, mWall_thk
+		del	1
+	endif
+
+	if	abs(SYMB_ROTANGLE) < EPS & WIDO_REVEAL_SIDE = 0	then
+		del	1
+	endif
+
+endif
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+"walllhole_total_2d"	:
+	
+	if	iClosure_num < EPS & iClosure_num_in < EPS	then
+
+		si = 0
+		put	0, 0, si,
+			mWidth_opening, 0, si,
+			mWidth_opening, mWall_thk, si,
+			0, mWall_thk, si
+
+		wallhole2	nsp/3, 2, 1, 1, 
+					0, 0, 0,
+					get(nsp)
+
+		for idx = 1	to	iFin_num
+			pen		iFin_pen_arr[idx][FIN_CONT_PEN]
+			wallline2 0, 0, 0, mFin_thk_arr[idx]
+			add2	mWidth_opening, 0
+				wallline2 0, 0, 0, mFin_thk_arr[idx]
+			del	1
+			add2	0, mFin_thk_arr[idx]
+		next idx
+		del	idx
+			
+	else
+
+		for idx = 1	to	iFin_num
+
+			bLine = 1				!	벽 라인 on/off
+
+			if	iClosure_type = TYPE2 	then
+
+				!	타입2 일때는 회전마감 두께만큼 개구부를 더 만들어줌
+				if	iClosure_num > EPS	then
+					mHoleW_sub = mFin_front_thk_real
+					if	bClosure_ex	then
+						mHoleW_sub = mHoleW_sub -mFin_thk_arr[mFin_front_idx1] + mClosure_ex_thk
+					endif
+				else
+					mHoleW_sub = mFin_end_thk_real
+					if	bClosure_ex	then
+						mHoleW_sub = mHoleW_sub -mFin_thk_arr[mFin_end_idx2] + mClosure_ex_thk
+					endif					
+				endif
+
+				!	타입2 일때 반대편에도 마감이 있을경우에는 첫번쨰 마감은 개구부 크기 변함 없음
+				if	idx = iFin_num	then
+					if	iClosure_num >=1 & mFin_end_thk > EPS	then
+						mHoleW_sub = 0
+					endif
+				endif
+				if	idx = 1	then
+					if	iClosure_num_in >=1 & mFin_front_thk > EPS	then
+						mHoleW_sub = 0
+					endif
+				endif				
+
+			else
+				mHoleW_sub = 0
+			endif
+				
+			!	전면
+			if	(idx >= mFin_front_idx1 & idx <= mFin_front_idx2) 	then
+				if	iClosure_num > EPS	then
+					num = idx
+					if	num <= iClosure_num then
+						mHoleW = mWidth_total
+						bLine = 0
+					else
+						mHoleW = mWidth_total - min(mClosure_thk, mClosure_offset)*2	
+						if	bClosure_ex	then
+							mHoleW = mHoleW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2
+							if	mHoleW < mWidth_opening	then
+								mHoleW = mWidth_opening
+							endif
+						endif
+					endif
+				else
+					mHoleW = mWidth_opening + mHoleW_sub*2
+				endif
+			endif
+
+			!	코어
+			if	(idx >= mCore_idx1 & idx <= mCore_idx2) 	then
+				mHoleW = mWidth_opening + mHoleW_sub*2
+				bLine = 1
+			endif
+
+			!	후면
+			if	(idx >= mFin_end_idx1 & idx <= mFin_end_idx2) 	then		
+				if	iClosure_num_in > EPS	then
+					num = iFin_num-idx+1
+					if	num <= iClosure_num_in then
+						mHoleW = mWidth_total
+						bLine = 0
+					else
+						mHoleW = mWidth_total - min(mClosure_thk, mClosure_offset_in)*2
+						if	bClosure_ex	then
+							mHoleW = mHoleW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2
+							if	mHoleW < mWidth_opening	then
+								mHoleW = mWidth_opening
+							endif							
+						endif						
+					endif
+				else
+					mHoleW = mWidth_opening + mHoleW_sub*2
+				endif
+			endif
+
+			si = 0
+			put	0, 0, si,
+				mHoleW, 0, si,
+				mHoleW, mFin_thk_arr[idx], si,
+				0, mFin_thk_arr[idx], si
+
+			add2	(mWidth_opening-mHoleW)/2, 0
+				!	개구부 
+				wallhole2	nsp/3, 2, 1, 1, 
+							0, 0, 0,
+							get(nsp)
+
+				!	벽 라인
+				if	bLine	then
+					pen		iFin_pen_arr[idx][FIN_CONT_PEN]
+					wallline2 0, 0, 0, mFin_thk_arr[idx]
+					add2	mHoleW, 0
+						wallline2 0, 0, 0, mFin_thk_arr[idx]
+					del	1
+				endif
+			del	1
+			add2	0, mFin_thk_arr[idx]
+		next idx
+		del	iFin_num		
+
+	endif
+
+return
+
+
+"closure_out_2d"	:
+
+	!	마감 
+	!----------------------------------------------------------------------------------------------------
+	add2	-mClosure_thk, 0
+
+		if	iClosure_num = 1	then
+
+			!	첫번째 마감
+			!----------------------------------------------------------------------------------------------------			
+			idx = 1
+			!	수직
+			mFinW = mWidth_total-mClosure_offset*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_front_thk + mClosure_stretch
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2
+				mFinT_x = mClosure_ex_thk
+				add2	mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk, 0
+			endif			
+			add2	mClosure_offset, 0
+				gosub	"finish_shape_vert_2d"
+			del	1
+			if	bClosure_ex	then	
+				del	1
+			endif
+
+			!	수평
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk
+			endif					
+			gosub	"finish_shape_hori_2d"
+
+		endif
+
+		if	iClosure_num = 2	then
+
+			!	두번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = 2
+			!	수직
+			mFinW = mWidth_total-mClosure_offset*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_front_thk - mFin_thk_arr[idx-1] + mClosure_stretch
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2	
+				add2	mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk, 0
+			endif				
+			add2	mClosure_offset, mFin_thk_arr[idx-1]			
+				gosub	"finish_shape_vert_2d"	
+			del	1
+			if	bClosure_ex	then	
+				del	1
+			endif
+
+			!	수평 
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset
+			mFinT_y = mFin_thk_arr[idx] 
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk
+			endif				
+			add2	0, mFin_thk_arr[idx-1]
+				gosub	"finish_shape_hori_2d"
+			del	1
+		
+			!	첫번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = 1
+			!	수직
+			mFinW = mWidth_total - mFin_thk_arr[idx+1]*2 -mClosure_offset*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_front_thk + mClosure_stretch
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2
+				mFinT_x = mClosure_ex_thk
+				add2	mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk, 0
+			endif			
+			add2	mFin_thk_arr[idx+1]+mClosure_offset, 0
+				gosub	"finish_shape_vert_2d"
+			del	1
+			if	bClosure_ex	then	
+				del	1
+			endif
+
+			!	수평
+			mFinW = mWidth_total
+			mFinT_x = mFin_thk_arr[idx+1] + mClosure_offset
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk
+			endif				
+			gosub	"finish_shape_hori_2d"
+		
+		endif
+
+		if	iClosure_num = 3	then
+
+			!	세번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = 3
+			!	수직
+			mFinW = mWidth_total - mClosure_offset*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_front_thk - mFin_thk_arr[idx-1] - mFin_thk_arr[idx-2] + mClosure_stretch
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2	
+				add2	mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk, 0
+			endif					
+			add2	mClosure_offset, mFin_thk_arr[idx-1] + mFin_thk_arr[idx-2]			
+				gosub	"finish_shape_vert_2d"	
+			del	1
+			if	bClosure_ex	then	
+				del	1
+			endif
+
+
+			!	수평 
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk
+			endif			
+			add2	0, mFin_thk_arr[idx-1] + mFin_thk_arr[idx-2]
+				gosub	"finish_shape_hori_2d"
+			del	1		
+
+			!	두번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = 2
+			!	수직			
+			mFinW = mWidth_total - mFin_thk_arr[idx+1]*2 - mClosure_offset*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_front_thk - mFin_thk_arr[idx-1] + mClosure_stretch
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2	
+				add2	mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk, 0
+			endif			
+			add2	mFin_thk_arr[idx+1] + mClosure_offset, mFin_thk_arr[idx-1]			
+				gosub	"finish_shape_vert_2d"	
+			del	1
+			if	bClosure_ex	then	
+				del	1
+			endif
+
+			!	수평 
+			mFinW = mWidth_total
+			mFinT_x = mFin_thk_arr[idx+1] + mClosure_offset
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk
+			endif
+			add2	0, mFin_thk_arr[idx-1]
+				gosub	"finish_shape_hori_2d"
+			del	1	
+
+			!	첫번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = 1	
+			!	수직
+			mFinW = mWidth_total - (mFin_thk_arr[idx+1] + mFin_thk_arr[idx+2])*2 -mClosure_offset*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_front_thk + mClosure_stretch
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)*2
+				mFinT_x = mClosure_ex_thk
+				add2	mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk, 0
+			endif
+			add2	mFin_thk_arr[idx+1] + mFin_thk_arr[idx+2] + mClosure_offset, 0
+				gosub	"finish_shape_vert_2d"
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평
+			mFinW = mWidth_total
+			mFinT_x = mFin_thk_arr[idx+2] + mFin_thk_arr[idx+1] + mClosure_offset
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk
+			endif			
+			gosub	"finish_shape_hori_2d"
+		endif
+
+	del	1
+
+
+	!	마감 조절 핫스팟 (평면)
+	!----------------------------------------------------------------------------------------------------
+	!	외곽 마감 오프셋 핫스팟
+	if	iClosure_num > EPS	then
+		if	iClosure_type = TYPE3	then
+			add2	0, mFin_front_thk
+				add2	 -mClosure_thk + mFin_front_thk_real, mClosure_stretch
+					hotspot2 	0, 	0, 					unID, mClosure_offset, 1 + 128		: unID = unID + 1			
+					hotspot2 	mClosure_offset,	0,	unID, mClosure_offset, 2			: unID = unID + 1		
+					hotspot2 	-1,	0, 					unID, mClosure_offset, 3			: unID = unID + 1		
+					add2	mWidth_opening -(-mClosure_thk + mFin_front_thk_real)*2, 0
+						hotspot2 	0, 	0, 					unID, mClosure_offset, 1 + 128		: unID = unID + 1			
+						hotspot2 	-mClosure_offset,	0, 	unID, mClosure_offset, 2			: unID = unID + 1		
+						hotspot2 	1,	0,					unID, mClosure_offset, 3			: unID = unID + 1				
+					del		1
+				del	1
+			del	1
+
+			add2	0, mFin_front_thk		
+				add2	 -mClosure_thk + mFin_front_thk_real + mClosure_offset, 0
+					hotspot2 	0, 	0, 					unID, mClosure_stretch, 1 + 128		: unID = unID + 1			
+					hotspot2 	0,	mClosure_stretch,	unID, mClosure_stretch, 2			: unID = unID + 1		
+					hotspot2 	0,	-1, 				unID, mClosure_stretch, 3			: unID = unID + 1		
+					add2	mWidth_opening -(-mClosure_thk + mFin_front_thk_real + mClosure_offset)*2, 0
+						hotspot2 	0, 	0, 					unID, mClosure_stretch, 1 + 128		: unID = unID + 1			
+						hotspot2 	0,	mClosure_stretch, 	unID, mClosure_stretch, 2			: unID = unID + 1		
+						hotspot2 	0,	-1,					unID, mClosure_stretch, 3			: unID = unID + 1				
+					del		1
+				del	1
+			del	1				
+		endif
+	endif
+
+
+return
+
+
+"closure_in_2d"	:
+
+	!	마감 
+	!----------------------------------------------------------------------------------------------------
+	add2	-mClosure_thk, mWall_thk
+
+		if	iClosure_num_in = 1	then
+
+			!	첫번째 마감
+			!----------------------------------------------------------------------------------------------------			
+			idx = mFin_end_idx2
+			!	수직
+			mFinW = mWidth_total-mClosure_offset_in*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_end_thk + mClosure_stretch_in
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2
+				mFinT_x = mClosure_ex_thk
+				add2	mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk, 0
+			endif					
+			add2	mClosure_offset_in, 0
+				mul2	1, -1
+					gosub	"finish_shape_vert_2d"
+				del	1
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset_in
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk
+			endif				
+			mul2	1, -1
+				gosub	"finish_shape_hori_2d"
+			del	1
+
+		endif
+
+		if	iClosure_num_in = 2	then
+
+			!	두번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = mFin_end_idx2 - 1
+			!	수직
+			mFinW = mWidth_total-mClosure_offset_in*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_end_thk - mFin_thk_arr[idx+1] + mClosure_stretch_in
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2	
+				add2	mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk, 0
+			endif				
+			mul2	1, -1
+				add2	mClosure_offset_in, mFin_thk_arr[idx+1]			
+					gosub	"finish_shape_vert_2d"	
+				del	1
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평 
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset_in
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk
+			endif				
+			mul2	1, -1
+				add2	0, mFin_thk_arr[idx+1]
+					gosub	"finish_shape_hori_2d"
+				del	1
+			del	1
+		
+			!	첫번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = mFin_end_idx2
+			!	수직
+			mFinW = mWidth_total - mFin_thk_arr[idx-1]*2 -mClosure_offset_in*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_end_thk + mClosure_stretch_in
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2
+				mFinT_x = mClosure_ex_thk
+				add2	mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk, 0
+			endif				
+			add2	mClosure_offset_in + mFin_thk_arr[idx-1], 0
+				mul2	1, -1
+					gosub	"finish_shape_vert_2d"
+				del	1
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset_in + mFin_thk_arr[idx-1]
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk
+			endif				
+			mul2	1, -1
+				gosub	"finish_shape_hori_2d"
+			del	1
+		
+		endif
+
+		if	iClosure_num_in = 3	then
+
+			!	세번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = mFin_end_idx2 - 2
+			!	수직			
+			mFinW = mWidth_total - mClosure_offset_in*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_end_thk - mFin_thk_arr[idx+1] - mFin_thk_arr[idx+2] + mClosure_stretch_in
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2	
+				add2	mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk, 0
+			endif				
+			mul2	1, -1
+				add2	mClosure_offset_in, mFin_thk_arr[idx+1] + mFin_thk_arr[idx+2]			
+					gosub	"finish_shape_vert_2d"	
+				del	1
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평 
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset_in
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk
+			endif				
+			mul2	1, -1
+				add2	0, mFin_thk_arr[idx+1] + mFin_thk_arr[idx+2]
+					gosub	"finish_shape_hori_2d"
+				del	1		
+			del	1
+
+			!	두번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = mFin_end_idx2 - 1
+			!	수직			
+			mFinW = mWidth_total - mFin_thk_arr[idx-1]*2 - mClosure_offset_in*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_end_thk - mFin_thk_arr[idx+1] + mClosure_stretch_in
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2	
+				add2	mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk, 0
+			endif				
+			mul2	1, -1
+				add2	mFin_thk_arr[idx-1] + mClosure_offset_in, mFin_thk_arr[idx+1]			
+					gosub	"finish_shape_vert_2d"	
+				del	1
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평 
+			mFinW = mWidth_total
+			mFinT_x = mFin_thk_arr[idx-1] + mClosure_offset_in
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk
+			endif			
+			mul2	1, -1
+				add2	0, mFin_thk_arr[idx+1]
+					gosub	"finish_shape_hori_2d"
+				del	1	
+			del	1		
+
+			!	첫번째 마감
+			!----------------------------------------------------------------------------------------------------
+			idx = mFin_end_idx2
+			!	수직
+			mFinW = mWidth_total - (mFin_thk_arr[idx-1] + mFin_thk_arr[idx-2])*2 -mClosure_offset_in*2
+			mFinT_x = mFin_thk_arr[idx]
+			mFinT_y = mFin_end_thk + mClosure_stretch_in
+			if	bClosure_ex	then
+				mFinW = mFinW - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)*2
+				mFinT_x = mClosure_ex_thk
+				add2	mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk, 0
+			endif			
+			add2	mClosure_offset_in + mFin_thk_arr[idx-1] + mFin_thk_arr[idx-2], 0
+				mul2	1, -1
+					gosub	"finish_shape_vert_2d"
+				del	1
+			del	1
+			if	bClosure_ex	then
+				del	1
+			endif
+
+			!	수평
+			mFinW = mWidth_total
+			mFinT_x = mClosure_offset_in + mFin_thk_arr[idx-1] + mFin_thk_arr[idx-2]
+			mFinT_y = mFin_thk_arr[idx]
+			if	bClosure_ex	then
+				mFinT_x = mFinT_x + mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk
+			endif				
+			mul2	1, -1
+				gosub	"finish_shape_hori_2d"
+			del	1
+		endif
+
+	del	1
+
+
+	!	마감 조절 핫스팟 (평면)
+	!----------------------------------------------------------------------------------------------------
+	!	외곽 마감 오프셋 핫스팟
+	if	iClosure_num > EPS	then
+		if	iClosure_type = TYPE3	then
+			add2	0, mWall_thk-mFin_end_thk
+				add2	 -mClosure_thk + mFin_end_thk_real, -mClosure_stretch_in
+					hotspot2 	0, 	0, 					unID, mClosure_offset_in, 1 + 128			: unID = unID + 1			
+					hotspot2 	mClosure_offset_in,	0,	unID, mClosure_offset_in, 2					: unID = unID + 1		
+					hotspot2 	-1,	0, 					unID, mClosure_offset_in, 3					: unID = unID + 1		
+					add2	mWidth_opening -(-mClosure_thk + mFin_end_thk_real)*2, 0
+						hotspot2 	0, 	0, 						unID, mClosure_offset_in, 1 + 128	: unID = unID + 1			
+						hotspot2 	-mClosure_offset_in,	0, 	unID, mClosure_offset_in, 2			: unID = unID + 1		
+						hotspot2 	1,	0,						unID, mClosure_offset_in, 3			: unID = unID + 1				
+					del		1
+				del	1
+			del	1
+
+			add2	0, mWall_thk-mFin_end_thk		
+				add2	 -mClosure_thk + mFin_end_thk_real + mClosure_offset_in, 0
+					hotspot2 	0, 	0, 							unID, mClosure_stretch_in, 1 + 128		: unID = unID + 1			
+					hotspot2 	0,	-mClosure_stretch_in,		unID, mClosure_stretch_in, 2			: unID = unID + 1		
+					hotspot2 	0,	1, 							unID, mClosure_stretch_in, 3			: unID = unID + 1		
+					add2	mWidth_opening -(-mClosure_thk + mFin_end_thk_real + mClosure_offset_in)*2, 0
+						hotspot2 	0, 	0, 						unID, mClosure_stretch_in, 1 + 128	: unID = unID + 1			
+						hotspot2 	0,	-mClosure_stretch_in, 	unID, mClosure_stretch_in, 2			: unID = unID + 1		
+						hotspot2 	0,	1,						unID, mClosure_stretch_in, 3			: unID = unID + 1				
+					del		1	
+				del	1
+			del	1				
+		endif
+	endif
+
+return
+
+
+"finish_shape_hori_2d"	:
+
+	!	내부 인자값 설명
+	! iFin_dir => 마감이 그려지는 방향 (1:수평, 2:수직, 3:모서리, 4:단독, 5:수평닫힘)
+	iFin_dir = 1
+	gosub	"finish_shape_2d"
+
+return
+
+
+"finish_shape_vert_2d"	:
+
+	!	내부 인자값 설명
+	! iFin_dir => 마감이 그려지는 방향 (1:수평, 2:수직, 3:모서리, 4:단독, 5:수평닫힘)
+	if	bClosure_ex & ((idx = mFin_front_idx1) | (idx = mFin_end_idx2))	then
+		!	별도 마감
+		iFin_dir = 4
+		gosub	"finish_shape_2d"
+	else
+		iFin_dir = 2
+		mFinT_y = mFinT_y - mFinT_x
+		add2	0, mFinT_x
+			gosub	"finish_shape_2d"
+		del	1
+
+		!	모서리
+		!	(예외처리 : 수직 연장값이 0일 경우 마지막 마감은 '수평닫힘' 처리)
+		iFin_dir = 3
+		if	idx >= mFin_front_idx1 & idx <= mFin_front_idx2	then
+			if	mClosure_stretch < EPS	then
+				if	abs(mFin_front_idx1-mFin_front_idx2)+1 = iClosure_num & idx = mFin_front_idx2	then
+					iFin_dir = 5
+				endif				
+			endif
+		endif
+		if	idx >= mFin_end_idx1 & idx <= mFin_end_idx2	then
+			if	mClosure_stretch_in < EPS	then
+				if	abs(mFin_end_idx1-mFin_end_idx2)+1 = iClosure_num_in & idx = mFin_end_idx1	then
+					iFin_dir = 5
+				endif				
+			endif
+		endif		
+		mFinT_y = mFinT_x
+		gosub	"finish_shape_2d"	
+	endif
+
+return
+
+
+"finish_shape_2d"	:
+
+	!	내부 인자값 설명
+	! idx => 마감 인덱스
+	! mFinW => 마감 총 너비
+	! mFinT_y => 마감 Y축 돌출
+	! mFinT_x => 개구부까지의 마감 두께
+
+	iFIll_insul = FILL_INSUL					!	단열재 인덱스 (단열재는 표현이 제대로 되지 않아 우선 그리지 않음)
+
+	!	마감이 그려지는 방향 (1:수평, 2:수직, 3:모서리, 4:단독, 5:수평닫힘)
+	if	mFinT_y > EPS & mFinT_x > EPS	then
+		if	idx <= iFin_num	then
+			si_on = 1
+			si_off = 0
+			if	iFin_dir = 1	then
+				put	0, 0, si_on,
+					mFinT_x, 0, si_off,
+					mFinT_x, mFinT_y, si_on,
+					0, mFinT_y, si_off,
+					0, 0, -1
+			endif
+			if	iFin_dir = 2	then		
+				put	0, 0, si_off,
+					mFinT_x, 0, si_on,
+					mFinT_x, mFinT_y, si_on,
+					0, mFinT_y, si_on,
+					0, 0, -1
+			endif
+			if	iFin_dir = 3	then		
+				put	0, 0, si_on,
+					mFinT_x, 0, si_on,
+					mFinT_x, mFinT_y, si_off,
+					0, mFinT_y, si_off,
+					0, 0, -1
+			endif	
+			if	iFin_dir = 4	then		
+				put	0, 0, si_on,
+					mFinT_x, 0, si_on,
+					mFinT_x, mFinT_y, si_on,
+					0, mFinT_y, si_on,
+					0, 0, -1
+			endif
+			if	iFin_dir = 5	then		
+				put	0, 0, si_on,
+					mFinT_x, 0, si_on,
+					mFinT_x, mFinT_y, si_on,
+					0, mFinT_y, si_off,
+					0, 0, -1
+			endif									
+
+			if	iFin_dir = 1 | iFin_dir = 2 | iFin_dir = 3 | iFin_dir = 5	then
+				pen		iFin_pen_arr[idx][FIN_CONT_PEN]
+				if	abs(iFin_fill_arr[idx]-iFIll_insul) > EPS	then
+					fill	iFin_fill_arr[idx]
+				else
+					!	단열재 표현시에는 배경 필로 채움
+					fill	iFIll_insul
+				endif
+				poly_fill_pen = iFin_pen_arr[idx][FIN_FILL_PEN]
+				poly_back_pen = iFin_pen_arr[idx][FIN_FILL_BACKPEN]
+				drawindex 30
+			else
+				!	별도 외부마감
+				if	iFin_dir = 4	then
+					pen	iClosure_ex_cont_pen
+					fill	iClosure_ex_fill
+					poly_fill_pen = iClosure_ex_fill_pen
+					poly_back_pen = iClosure_ex_back_pen
+					drawindex 50
+				endif
+			endif
+
+			poly2_b{2}		nsp/3, 1+2+4+8+16, poly_fill_pen, poly_back_pen,
+							0, 0, 0,
+							use(nsp)
+
+			add2	mFinW, 0
+				mul2	-1, 1
+					poly2_b{2}		nsp/3, 1+2+4+8+16, poly_fill_pen, poly_back_pen,
+									0, 0, 0,
+									get(nsp)
+				del	1
+			del	1
+
+			if	iFin_dir = 4	then
+				drawindex 30
+			endif
+
+		else
+			print str(idx,1,0) + "번째 인덱스는 iFin_num 이상의 수를 가지므로 표현되지 않습니다."	
+		endif
+	endif
+
+return
+
+
+"test_origin_2d"	:
+
+	circle2	0, 0, 0.01
+	circle2	0, 0, 0.05
+	hotspot2	0, 0
+
+return
+
+
+"test_window_2d"	:
+
+	rect2	0, 0, mWidth_frame, 0.100
+return

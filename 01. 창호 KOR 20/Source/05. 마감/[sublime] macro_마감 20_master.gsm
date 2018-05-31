@@ -1,0 +1,423 @@
+
+
+!======================================================================================================
+!	창호 20 - 마감
+!======================================================================================================
+!	DATE : 2017/8/31 THU
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest_closure	then
+	n = request("name_of_macro", "", stMyname)
+	stMyname = stMyname
+endif
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+EPS = 0.0001
+
+if	GLOB_SCRIPT_TYPE <> 5	then
+	if	GLOB_STRUCTURE_DISPLAY <> 0 	then
+		!	Entire Model 일 경우에 표현
+		bClosure = 0
+	endif
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	타입 정의 
+!----------------------------------------------------------------------------------------------------
+
+	!	마감 표현
+	!----------------------------------------------------------------------------------------------------
+	!	'iDim' 인덱스
+	DIM1 = 1 
+	DIM2 = 2 
+	DIM3 = 3 
+
+	dim stDim[]
+		stDim[DIM1] = "제작치수"
+		stDim[DIM2] = "모듈호칭치수"
+		stDim[DIM3] = "개구부치수"
+
+	!	'iClosure_type' 인덱스
+	TYPE1 = 1					
+	TYPE2 = 2					
+	TYPE3 = 3	
+
+	dim	stClosure_type_arr[]
+		stClosure_type_arr[TYPE1] = "타입1"		
+		stClosure_type_arr[TYPE2] = "타입2"		
+		stClosure_type_arr[TYPE3] = "타입3"			
+
+	!	'iFin_arr'	인덱스
+	!	0:코어 또는 기타, 1:마감
+	FIN_CORE = 0
+	FIN_FINISH = 1
+
+	!	'iCore_arr'	인덱스
+	!	0:파트 아님, 1:파트, 3:마지막 스킨에 코어
+	CORE_NONEPART = 0
+	CORE_PART = 1
+	CORE_PART_LAST = 3
+
+	!	'iFin_pen_arr'	인덱스
+	FIN_FILL_PEN = 1
+	FIN_FILL_BACKPEN = 2
+	FIN_CONT_PEN = 3
+	FIN_FILL_2D = 4
+
+	!	채우기 인덱스
+	FILL_BACKGROUND = 65			!	배경 필 인덱스
+	FILL_INSUL = 134				!	단열재 필 인덱스 
+
+
+	!	2D / 3D 표현
+	!----------------------------------------------------------------------------------------------------
+	!	'iDetail_2d' 인덱스
+	DETAIL_2D_SIMPLE = 1					
+	DETAIL_2D_DETAIL = 2					
+	DETAIL_2D_OFF = 3	
+	DETAIL_2D_MVO = 4
+
+	!	'iDetail_3d' 인덱스
+	DETAIL_3D_SIMPLE = 1					
+	DETAIL_3D_DETAIL = 2					
+	DETAIL_3D_OFF = 3	
+	DETAIL_3D_MVO = 4
+
+
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	마감 정보 
+!----------------------------------------------------------------------------------------------------
+!	1. 총 마감 개수
+iFin_num = WALL_SKINS_NUMBER
+
+!	2. 마감 위치
+!	0:코어 또는 기타, 1:마감
+dim	iFin_arr[]
+dim	iCore_arr[]
+for idx = 1	to	iFin_num
+	iFin_arr[idx] = WALL_SKINS_PARAMS[idx][15]
+	iCore_arr[idx] = WALL_SKINS_PARAMS[idx][6]
+next idx
+
+!	3. 마감별 재질
+!	3D 스크립트에 작성
+
+!	4. 마감별 채우기/채우기펜/배경펜/외곽선펜
+dim iFin_fill_arr[]
+dim	iFin_pen_arr[][]
+for idx = 1	to	iFin_num
+	iFin_fill_arr[idx] = WALL_SKINS_PARAMS[idx][1]
+	iFin_pen_arr[idx][FIN_CONT_PEN] = WALL_SKINS_PARAMS[idx][11]
+	iFin_pen_arr[idx][FIN_FILL_PEN] = WALL_SKINS_PARAMS[idx][4]
+	iFin_pen_arr[idx][FIN_FILL_BACKPEN] = WALL_SKINS_PARAMS[idx][5]
+next idx
+
+!	5. 마감별 두께
+dim	mFin_thk_arr[]
+for idx = 1	to	iFin_num
+	mFin_thk_arr[idx] = WALL_SKINS_PARAMS[idx][2]
+next idx
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------
+
+	!	마감 활성화
+	!----------------------------------------------------------------------------------------------------
+	if	iFin_num = 0	then	
+		bClosure = 0
+	endif
+
+	!	마감 정보 초기화
+	!----------------------------------------------------------------------------------------------------
+	if	bClosure = 0	then
+		iClosure_num = 0
+		iClosure_num_in = 0
+		mClosure_offset = 0
+		mClosure_offset_in = 0
+	endif
+
+	!	마감/코어 인덱스,두께 
+	!----------------------------------------------------------------------------------------------------
+	!	1. 코어 
+	bCore = 0							!	코어 여부 
+	mCore_thk = 0
+	mCore_idx1 = 0						!	코어 첫번째 인덱스
+	mCore_idx2 = 0						!	코어 마지막 인덱스
+	for idx = 1	to	iFin_num
+		if	abs(iCore_arr[idx]-CORE_PART) < EPS | abs(iCore_arr[idx]-CORE_PART_LAST) < EPS	then
+			mCore_thk = mCore_thk + mFin_thk_arr[idx]
+			if	bCore = 0	then
+				mCore_idx1 = idx
+				mCore_idx2 = idx
+			else
+				mCore_idx2 = idx
+			endif
+			bCore = 1
+		endif
+	next idx
+
+	!	2. 전면 마감
+	bFin_front = 0						!	전면 마감 여부 
+	mFin_front_thk = 0
+	mFin_front_idx1 = 1					!	전면 마감 첫번째 인덱스
+	mFin_front_idx2 = mCore_idx1-1		!	전면 마감 마지막 인덱스
+	for idx = mFin_front_idx1	to	mFin_front_idx2
+		mFin_front_thk = mFin_front_thk + mFin_thk_arr[idx]
+		bFin_front = 1
+	next idx
+	if	bFin_front	then
+		if	iClosure_num > abs(mFin_front_idx1-mFin_front_idx2)+1	then
+			iClosure_num = abs(mFin_front_idx1-mFin_front_idx2)+1
+		endif
+	else
+		iClosure_num = 0
+	endif
+
+	!	3. 후면 마감
+	bFin_end = 0						!	후면 마감 여부 
+	mFin_end_thk = 0
+	mFin_end_idx1 = mCore_idx2+1		!	전면 마감 첫번째 인덱스
+	mFin_end_idx2 = iFin_num			!	전면 마감 마지막 인덱스
+	if	mFin_end_idx1 <= mFin_end_idx2	then
+		for idx = mFin_end_idx1	to	mFin_end_idx2
+			mFin_end_thk = mFin_end_thk + mFin_thk_arr[idx]
+			bFin_end = 1
+		next idx
+	endif
+	if	bFin_end	then
+		if	iClosure_num_in > abs(mFin_end_idx1-mFin_end_idx2)+1	then
+			iClosure_num_in = abs(mFin_end_idx1-mFin_end_idx2)+1
+		endif
+	else
+		iClosure_num_in = 0
+	endif
+
+	!	4. 전체 두께
+	if	iFin_num > EPS	then	
+		mWall_thk = mCore_thk + mFin_front_thk + mFin_end_thk
+	else
+		mWall_thk = WALL_THICKNESS
+	endif
+
+	!	마감 적용 두께 (mClosure_thk)
+	!----------------------------------------------------------------------------------------------------
+	mFin_front_thk_real = 0						!	전면 실제 적용 마감 두께
+	mFin_end_thk_real = 0						!	후면 실제 적용 마감 두께
+
+	for idx = 1	to	iClosure_num
+		mFin_front_thk_real = mFin_front_thk_real + mFin_thk_arr[idx]
+	next idx
+	for idx2 = 1	to	iClosure_num_in
+		idx = iFin_num - idx2 + 1
+		mFin_end_thk_real = mFin_end_thk_real + mFin_thk_arr[idx]
+	next idx2
+
+	mClosure_thk = max(mFin_front_thk_real, mFin_end_thk_real)
+
+
+
+	!	마감 타입에 따른 오프셋값, 연장값
+	!----------------------------------------------------------------------------------------------------
+	if	bClosure  then
+		
+		!	타입 1
+		!	오프셋 : 개구부 높이만큼 자동 오프셋
+		!	연장 : 0		
+		if	iClosure_type = TYPE1	then
+			mClosure_offset = mClosure_thk - mFin_front_thk_real 
+			mClosure_offset_in = mClosure_thk - mFin_end_thk_real
+			mClosure_stretch = 0
+			mClosure_stretch_in = 0
+			!	파라미터 스크립트에서 값 입력	
+		endif
+
+		!	타입 2
+		!	오프셋 : 개구부 높이와 마감회전 두께만큼 오프셋
+		!	연장 : 벽두께만큼 연장
+		if	iClosure_type = TYPE2	then
+			if	iClosure_num >= 1	then
+				mClosure_offset = 0
+				mClosure_stretch = mCore_thk + mFin_end_thk
+				if	mFin_end_thk > EPS	then
+					mClosure_stretch = mClosure_stretch - mFin_thk_arr[mFin_end_idx2]
+				endif
+			endif
+			if	iClosure_num_in >= 1	then
+				mClosure_offset_in = 0
+				mClosure_stretch_in = mCore_thk + mFin_front_thk
+				if	mFin_front_thk > EPS	then
+					mClosure_stretch_in = mClosure_stretch_in - mFin_thk_arr[mFin_front_idx1]
+				endif				
+			endif
+			!	파라미터 스크립트에서 값 입력			
+		endif
+
+		!	타입 3
+		!	오프셋 : 개구부 높이와 마감회전 두께만큼 오프셋
+		!	연장 : 0
+		if	iClosure_type = TYPE3	then
+			if	GLOB_MODPAR_NAME = "iClosure_type" | GLOB_MODPAR_NAME = "iClosure_num" | GLOB_MODPAR_NAME = "iClosure_num_in"  then
+				if	not(bClosure_ex)	then
+					mClosure_offset = mClosure_thk
+					mClosure_offset_in = mClosure_thk
+				else
+					mClosure_offset = mClosure_thk - (mFin_thk_arr[mFin_front_idx1] - mClosure_ex_thk)
+					mClosure_offset_in = mClosure_thk - (mFin_thk_arr[mFin_end_idx2] - mClosure_ex_thk)
+				endif
+		
+				mClosure_stretch = 0
+				mClosure_stretch_in = 0
+				!	파라미터 스크립트에서 값 입력	
+			endif		
+		endif
+
+	endif
+
+
+
+	!	치수 연동
+	!----------------------------------------------------------------------------------------------------
+		!	A,B 수정시
+		!----------------------------------------------------------------------------------------------------
+		if	GLOB_MODPAR_NAME = "A"	then
+			if	iDim = DIM1 then mWidth_1 = A
+			if	iDim = DIM2 then mWidth_2 = A
+			if	iDim = DIM3 then mWidth_3 = A
+		endif
+		if	GLOB_MODPAR_NAME = "B"	then
+			if	iDim = DIM1 then mHeight_1 = B
+			if	iDim = DIM2 then mHeight_2 = B
+			if	iDim = DIM3 then mHeight_3 = B
+		endif
+
+		!	세부치수 인덱스 변경시
+		!----------------------------------------------------------------------------------------------------
+		if	GLOB_MODPAR_NAME = "iDim"	then
+			if	iDim = DIM1 then A = mWidth_1
+			if	iDim = DIM2 then A = mWidth_2
+			if	iDim = DIM3 then A = mWidth_3
+			if	iDim = DIM1 then B = mHeight_1
+			if	iDim = DIM2 then B = mHeight_2
+			if	iDim = DIM3 then B = mHeight_3
+		endif
+
+		!	세부치수 수정시
+		!----------------------------------------------------------------------------------------------------
+		if	iDim = DIM1 	then
+			if	GLOB_MODPAR_NAME = "mWidth_1" 		then 	A = mWidth_1
+			if	GLOB_MODPAR_NAME = "mHeight_1"  	then	B = mHeight_1
+		endif 
+		if	iDim = DIM2 	then
+			if	GLOB_MODPAR_NAME = "mWidth_2" 		then 	A = mWidth_2
+			if	GLOB_MODPAR_NAME = "mHeight_2"  	then	B = mHeight_2
+		endif
+		if	iDim = DIM3 	then
+			if	GLOB_MODPAR_NAME = "mWidth_3" 		then 	A = mWidth_3
+			if	GLOB_MODPAR_NAME = "mHeight_3"  	then	B = mHeight_3
+		endif	
+
+		mDis_width = mDis_L+mDis_R							!	치수 거리 합
+		mDis_height = mDis_T+mDis_B
+
+		_bCalc = 0
+		if	GLOB_MODPAR_NAME = "mDis" | GLOB_MODPAR_NAME = "mDis_L" | GLOB_MODPAR_NAME = "mDis_R" | GLOB_MODPAR_NAME = "mDis_T" | GLOB_MODPAR_NAME = "mDis_B" | GLOB_MODPAR_NAME = "bDis" \
+			| GLOB_MODPAR_NAME = "A" | GLOB_MODPAR_NAME = "B" \
+			| GLOB_MODPAR_NAME = "iDim"	then
+			_bCalc = 1
+		endif
+
+		if	iDim = DIM1 	then
+			if	GLOB_MODPAR_NAME = "mWidth_1" | _bCalc	then
+				mWidth_2 = mWidth_1 + mDis_width/2
+				mWidth_3 = mWidth_1 + mDis_width
+			endif
+			if	GLOB_MODPAR_NAME = "mHeight_1" | _bCalc 	then
+				mHeight_2 = mHeight_1 + mDis_height/2
+				mHeight_3 = mHeight_1 + mDis_height	
+			endif
+		endif 
+		if	iDim = DIM2 	then
+			if	GLOB_MODPAR_NAME = "mWidth_2" | _bCalc	then
+				mWidth_1 = mWidth_2 - mDis_width/2
+				mWidth_3 = mWidth_2 + mDis_width/2	
+			endif
+			if	GLOB_MODPAR_NAME = "mHeight_2" | _bCalc	then
+				mHeight_1 = mHeight_2 - mDis_height/2
+				mHeight_3 = mHeight_2 + mDis_height/2	
+			endif
+		endif
+		if	iDim = DIM3 	then
+			if	GLOB_MODPAR_NAME = "mWidth_3" | _bCalc	then
+				mWidth_1 = mWidth_3 - mDis_width
+				mWidth_2 = mWidth_3 - mDis_width/2
+			endif
+			if	GLOB_MODPAR_NAME = "mHeight_3" | _bCalc	then
+				mHeight_1 = mHeight_3 - mDis_height
+				mHeight_2 = mHeight_3 - mDis_height/2	
+			endif
+		endif
+
+
+		!	창호 치수
+		!---------------------------------------------------------------------------------------------------
+		mWidth_frame = 0
+		mHeight_frame = 0
+		mWidth_opening = 0
+		mHeight_opening = 0
+
+		!	SIMPLE / OFF
+		!	- frame : 선택한 치수를 따라 창호 사이즈가 결정된다.
+		!	- opening : 프레임 사이즈와 동일하다.
+		if	(GLOB_SCRIPT_TYPE = 2 & (iDetail_2d = DETAIL_2D_SIMPLE | iDetail_2d = DETAIL_2D_OFF)) \
+			| (GLOB_SCRIPT_TYPE = 3 & (iDetail_3d = DETAIL_3D_SIMPLE | iDetail_3d = DETAIL_3D_OFF))	then
+			if	iDim = DIM1 	then
+				mWidth_frame = mWidth_1
+				mHeight_frame = mHeight_1
+			endif 
+			if	iDim = DIM2 	then
+				mWidth_frame = mWidth_2
+				mHeight_frame = mHeight_2
+			endif
+			if	iDim = DIM3 	then
+				mWidth_frame = mWidth_3
+				mHeight_frame = mHeight_3
+			endif
+
+			mWidth_opening = mWidth_frame
+			mHeight_opening = mHeight_frame
+		endif
+
+		!	DETAIL
+		!	- frame : 제작치수를 따라 창호 사이즈가 결정된다.
+		!	- opening : 개구부치수를 따라 오프닝 사이즈가 결정된다.
+		if	(GLOB_SCRIPT_TYPE = 2 & iDetail_2d = DETAIL_2D_DETAIL) \
+			| (GLOB_SCRIPT_TYPE = 3 & iDetail_3d = DETAIL_3D_DETAIL)	then
+			mWidth_frame = mWidth_1
+			mHeight_frame = mHeight_1
+			mWidth_opening = mWidth_3
+			mHeight_opening = mHeight_3		
+		endif	
+
+
+		!	개구부 전체 크기(마감포함)
+		!----------------------------------------------------------------------------------------------------
+		mWidth_total = mWidth_opening + mClosure_thk*2 
+		mHeight_total = mHeight_opening + mClosure_thk*2 
+
+		mWidth = A
+		mHeight = B

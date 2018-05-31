@@ -1,0 +1,139 @@
+
+!======================================================================================================
+!	창호 20 - 프레임(창호)
+!======================================================================================================
+!	DATE : 2018/2/7 WED
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	매크로 연동
+!----------------------------------------------------------------------------------------------------
+call	"macro_표현 20.gsm"			parameters	all
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 정의
+!----------------------------------------------------------------------------------------------------
+	!	타입
+	!------------------------------------------------------------------------------------------------------
+	values{2}	"iFrame_type",
+				FRAME_TYPE1, stFrame_type[FRAME_TYPE1],
+				FRAME_TYPE2, stFrame_type[FRAME_TYPE2],
+				FRAME_TYPE3, stFrame_type[FRAME_TYPE3]
+
+	values{2}	"iFrame_joint",
+				FRAME_JOINT_45CUT, stFrame_joint[FRAME_JOINT_45CUT],
+				FRAME_JOINT_90CUT, stFrame_joint[FRAME_JOINT_90CUT]
+
+	!	사이즈
+	!------------------------------------------------------------------------------------------------------
+	if	iFrame_joint = FRAME_JOINT_45CUT	then
+		values{2}	"iFrame_setting",
+					FRAME_SIZE_ONCE, stFrame_setting[FRAME_SIZE_ONCE]
+	endif
+	if	iFrame_joint = FRAME_JOINT_90CUT	then
+		values{2}	"iFrame_setting",
+					FRAME_SIZE_ONCE, stFrame_setting[FRAME_SIZE_ONCE],
+					FRAME_SIZE_VERTHORI, stFrame_setting[FRAME_SIZE_VERTHORI]
+	endif	
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 범위 정의
+!----------------------------------------------------------------------------------------------------				
+	!	사이즈
+	!------------------------------------------------------------------------------------------------------
+	values  "A" range [0.05, 10.000]
+	values  "B" range [0.05, 10.000]
+	values  "mWidth" range [0.05, 10.000]
+	values  "mHeight" range [0.05, 10.000]
+
+	mFrame_size_min = 0.010
+	mFrame_size_max = 0.300
+	values	"mFrame_w" range [mFrame_size_min, mFrame_size_max]
+	values	"mFrame_d" range [mFrame_size_min, mFrame_size_max]
+	values	"mFrame_vert_w" range [mFrame_size_min, mFrame_size_max]
+	values	"mFrame_vert_d" range [mFrame_size_min, mFrame_size_max]
+	values	"mFrame_hori_w" range [mFrame_size_min, mFrame_size_max]
+	values	"mFrame_hori_d" range [mFrame_size_min, mFrame_size_max]
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 연동
+!----------------------------------------------------------------------------------------------------		
+
+	!	사이즈
+	!------------------------------------------------------------------------------------------------------
+	if	GLOB_MODPAR_NAME = "A"	then
+		mWidth = A
+		parameters	mWidth = A
+	endif
+	if	GLOB_MODPAR_NAME = "B"	then
+		mHeight = B
+		parameters	mHeight = B
+	endif
+	if	GLOB_MODPAR_NAME = "mWidth"	then
+		A = mWidth
+		parameters	A = mWidth
+	endif
+	if	GLOB_MODPAR_NAME = "mHeight"	then
+		B = mHeight
+		parameters	B = mHeight
+	endif
+
+	mFrame_d = mDepth
+	mFrame_vert_d = mDepth
+	parameters	mFrame_d = mFrame_d
+	parameters	mFrame_vert_d = mFrame_vert_d
+
+	if	iFrame_joint = FRAME_JOINT_45CUT	then
+		parameters	iFrame_setting = FRAME_SIZE_ONCE
+	endif
+
+
+	!	2D 표현
+	!------------------------------------------------------------------------------------------------------
+	if	not(bFrame_pen_setting)	then
+		parameters 	iFrame_cont_pen = iFrame_all_pen,
+					iFrame_sect_pen = iFrame_all_pen,
+					iFrame_pen = iFrame_all_pen
+	else
+		parameters 	iFrame_all_pen = iFrame_cont_pen
+	endif
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	잠금 및 숨김
+!----------------------------------------------------------------------------------------------------
+	!	2D 표현
+	!------------------------------------------------------------------------------------------------------
+	if	bFrame_pen_setting	then
+		lock	"iFrame_all_pen"
+		hideparameter	"iFrame_all_pen"
+	else
+		lock	"iFrame_cont_pen", "iFrame_sect_pen", "iFrame_pen"
+		hideparameter 	"iFrame_cont_pen", "iFrame_sect_pen", "iFrame_pen"
+	endif
+
+	!	사이즈 
+	!------------------------------------------------------------------------------------------------------
+	lock	"mFrame_d"
+	lock	"mFrame_vert_d"
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+

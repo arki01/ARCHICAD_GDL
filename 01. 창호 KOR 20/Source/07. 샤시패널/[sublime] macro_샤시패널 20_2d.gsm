@@ -1,0 +1,173 @@
+
+!======================================================================================================
+!	샤시패널 20
+!======================================================================================================
+!   DATE : 2017/8/18 FRI
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+define style "style_test_2d"	"맑은 고딕", 1, 1, 0
+set style	"style_test_2d"
+
+if	bTest	then
+	! project2	3, 270, 2
+	! text2	0, 0, stMyname
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	2D 심볼
+!----------------------------------------------------------------------------------------------------
+
+	!	핫스팟
+	!----------------------------------------------------------------------------------------------------
+
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	!	최하단에 있는 프레임만 보이도록 한다.
+	!	추후 요청사항 있을시 추가 개발 할 것.
+!	if	iDetail_2d = DETAIL_2D_SIMPLE	then
+	if	_bFrame	then
+		drawindex 50
+		gosub	"frame_vert_2d"
+		drawindex 40
+		gosub	"frame_hori_2d"
+	endif
+!	endif
+
+
+	!	유리
+	!----------------------------------------------------------------------------------------------------
+!	if	iDetail_2d = DETAIL_2D_SIMPLE	then
+	if	_bGlass	then
+		if	iGlass_type = GLASS_SINGLE 	then
+			add2	0, mFrame_d/2
+				gosub	"glass_2d"
+			del	1
+		endif
+
+		if	iGlass_type = GLASS_DOUBLE 	then
+			add2	0,	mFrame_d/2 - (mGlass_dis+mGlass_thk)/2 
+				gosub	"glass_2d"
+				add2	0,	mGlass_dis + mGlass_thk 
+					gosub	"glass_2d"
+				del	1
+			del	1
+		endif
+
+		if	iGlass_type = GLASS_TRIPLE 	then
+			add2	0, mFrame_d/2 - (mGlass_dis+mGlass_thk)
+				gosub	"glass_2d"
+				add2	0, mGlass_dis + mGlass_thk
+					gosub	"glass_2d"
+					add2	0, mGlass_dis + mGlass_thk 
+						gosub	"glass_2d"
+					del	1						
+				del	1
+			del	1
+		endif	
+	endif
+
+
+
+!	endif
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+
+"frame_vert_shape_2d"	:
+
+	put	-mFrmW_sub/2, 0, 1,
+		mFrmW_sub/2, 0, 1,
+		mFrmW_sub/2, mFrmD_sub, 1,
+		-mFrmW_sub/2, mFrmD_sub, 1,
+		-mFrmW_sub/2, 0, -1
+
+	pen	iSash_cont_pen	
+	fill iSash_fill				
+	si = 1+0+4+8+16
+	poly2_b{2}		nsp/3, si, iSash_fill_pen, iSash_back_pen,
+					0, 0, 0,
+					get(nsp)
+
+return
+
+
+"frame_hori_shape_2d"	:
+
+	put	0, 0, 1,
+		mFrmL_sub, 0, 1,
+		mFrmL_sub, mFrmD_sub, 1,
+		0, mFrmD_sub, 1,
+		0, 0, -1
+
+	pen	iSash_cont_pen_hori
+	fill iSash_fill						
+	si = 1+0+4+8+16
+	poly2_b{2}		nsp/3, si, iSash_fill_pen, iSash_back_pen,
+					0, 0, 0,
+					get(nsp)
+
+return
+
+
+
+"frame_vert_2d"	:
+
+	mFrmW_sub = mFrame_w
+	mFrmD_sub = mFrame_d
+	add2	mFrame_w/2, 0
+		gosub	"frame_vert_shape_2d"
+	del	1
+	add2	mWidth - mFrame_w/2, 0
+		gosub	"frame_vert_shape_2d"
+	del	1
+
+return
+
+
+"frame_hori_2d"	:
+
+	mFrmD_sub = mFrame_d
+	mFrmL_sub = mWidth - mFrame_w*2
+	add2	mFrame_w, 0
+		gosub	"frame_hori_shape_2d"
+	del	1
+
+return
+
+
+"glass_2d"	:
+
+	pen	iGlass_cont_pen
+	
+	if	_bFrame	then
+		mGrsL_sub = mWidth - mFrame_w*2	
+		add2	mFrame_w, 0
+			line2	0, 0, mGrsL_sub, 0
+		del	1
+	else
+		mGrsL_sub = mWidth - mFrame_w*2	
+		line2	0, 0, mGrsL_sub, 0
+	endif
+
+return
+

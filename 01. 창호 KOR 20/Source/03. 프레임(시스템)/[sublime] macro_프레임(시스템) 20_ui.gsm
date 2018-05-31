@@ -1,0 +1,145 @@
+
+
+!======================================================================================================
+!	창호 20 - 프레임
+!======================================================================================================
+!	DATE : 2017/10/20 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+
+
+!-----------------------------------------------------------------
+!	공통
+!-----------------------------------------------------------------
+! UI Size
+UI_max_width = 444
+UI_max_height = 296
+!  - Width : 444px
+!  - Height : 296px
+
+startX = 10
+startY = 5
+spaceY_title = 24			!	타이틀 간의 간격
+spaceY_list = 22			!	항목간의 간격
+
+separator_posY = 121		!	분리자 위치
+
+
+	ui_page	iFrame_uipage, -1, "프레임", "UImg_Tab_Frame"
+
+		!	프레임 설정
+		!-----------------------------------------------------------------
+		posX = startX
+		posY = startY
+		posX_list = startX+10
+
+			!	사이즈 설정
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"사이즈",	posX, posY	
+			posY = posY + spaceY_list
+
+			ui_style 	0,	0			
+			ui_outfield	"입력 방식",	posX_list, posY			
+			ui_infield "iFrame_setting", posX_list+55, posY-3, 80, 20 
+
+			!	일괄 설정
+			if	iFrame_setting = FRAME_SIZE_ONCE	then
+				ui_style 	0,	0
+				ui_outfield	"전체 : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_once_w", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_once_d", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20				
+			endif
+			!	개별 설정
+			if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+				ui_style 	0,	0
+				ui_outfield	"수직 : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_vert_w", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_vert_d", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20
+
+				posY = posY + spaceY_list
+				ui_style 	0,	0
+				ui_outfield	"수평 : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_hori_w", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_hori_d", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20	
+			endif
+			if	iFrame_setting = FRAME_SIZE_INOUT	then
+				ui_style 	0,	0
+				ui_outfield	"수직(외) : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_vert_w", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_vert_d", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20
+
+				posY = posY + spaceY_list
+				ui_style 	0,	0
+				ui_outfield	"수평(외) : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_hori_w", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_hori_d", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20	
+
+				posY = posY + spaceY_list
+				ui_style 	0,	0
+				ui_outfield	"수직(내) : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_vert_w_in", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_vert_d_in", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20
+
+				posY = posY + spaceY_list
+				ui_style 	0,	0
+				ui_outfield	"수평(내) : ",	posX_list+145, posY
+				ui_outfield	"너비(mm)",	posX_list +50 +145, posY
+				ui_infield 	"mFrame_hori_w_in", posX_list +50 +145 + 50, posY-4, 50, 20
+				ui_outfield	"깊이(mm)",	posX_list +50 +145 + 50 + 55, posY
+				ui_infield 	"mFrame_hori_d_in", posX_list +50 +145 + 50 + 55 + 50, posY-4, 50, 20					
+			endif
+
+		ui_separator	startX, separator_posY, UI_max_width-startX, separator_posY
+		posY = separator_posY
+		posY = posY + 10
+
+
+		!	2D / 3D 표현 
+		!-----------------------------------------------------------------
+		ui_style 	0,	1
+		ui_outfield	"2D / 3D 표현",	posX, posY	
+		posY = posY + spaceY_list
+
+		! 리스트 정의
+		iList_idx = iFrame_uipage
+		IList_num = 1
+		ui_listfield iList_idx, posX, posY, UI_max_width-posX*2, UI_max_height-posY-45, 0
+
+		! 2D 표현
+		ui_listitem IList_num, iList_idx, "", 0, "", "2D 표현"				: IList_num = IList_num+1
+		ui_listitem IList_num, iList_idx, "bFrame_pen_setting",	1			: IList_num = IList_num+1
+		if	bFrame_pen_setting	then
+			ui_listitem IList_num, iList_idx, "iFrame_cont_pen",	1			: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iFrame_sect_pen",	1			: IList_num = IList_num+1		
+			ui_listitem IList_num, iList_idx, "iFrame_pen",	1					: IList_num = IList_num+1
+		else
+			ui_listitem IList_num, iList_idx, "iFrame_all_pen",	1			: IList_num = IList_num+1
+		endif
+
+		! 3D 표현
+		ui_listitem IList_num, iList_idx, "", 0, "", "3D 표현"				: IList_num = IList_num+1
+		ui_listitem IList_num, iList_idx, "iFrame_mat", 1					: IList_num = IList_num+1	
+
+	
+
+
+

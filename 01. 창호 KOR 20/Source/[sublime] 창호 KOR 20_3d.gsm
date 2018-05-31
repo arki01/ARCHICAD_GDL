@@ -1,0 +1,76 @@
+
+!======================================================================================================
+!	창호 KOR 20
+!======================================================================================================
+!   DATE : 2018/02/07 WED
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	창호
+!----------------------------------------------------------------------------------------------------
+rotx	-90
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	addy	mOffset
+		!	 Flip시에 프레임이 이동하지 않도록 
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			addy	-mDepth
+		endif
+		addx	-mWidth/2
+			call	"macro_프레임(창호) 20.gsm"	parameters	all
+		del	1
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			del	1
+		endif
+	del	1
+
+	!	패널
+	!----------------------------------------------------------------------------------------------------
+	addy	mOffset
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			addy	-mDepth
+		endif
+		if	iFrame_setting = FRAME_SIZE_ONCE	then
+			_mFrm_offsetz = mFrame_w				
+		endif
+		if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+			_mFrm_offsetz = mFrame_hori_w
+		endif
+
+		add		-mSash_width/2, mSash_offset, _mFrm_offsetz
+			call	"macro_패널 20.gsm"	parameters	all	
+		del	1
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			del	1
+		endif
+	del	1
+
+del	1
+
+
+	!	마감
+	!----------------------------------------------------------------------------------------------------
+	call	"macro_마감 20.gsm"	parameters	all
+
+
+
+
+

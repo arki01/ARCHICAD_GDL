@@ -1,0 +1,142 @@
+
+
+!======================================================================================================
+!	창호 20 - 마감
+!======================================================================================================
+!	DATE : 2017/10/18 WED
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+
+
+!-----------------------------------------------------------------
+!	공통
+!-----------------------------------------------------------------
+! UI Size
+UI_max_width = 444
+UI_max_height = 296
+!  - Width : 444px
+!  - Height : 296px
+
+startX = 10
+startY = 5
+spaceY_title = 24			!	타이틀 간의 간격
+spaceY_list = 22			!	항목간의 간격
+
+separator_posY = 121		!	분리자 위치
+
+
+	!	Page 1
+	!-----------------------------------------------------------------
+	ui_page	iClosure_uipage, -1, "마감", "UImg_Tab_Closure"
+
+		!	마감 세부 설정
+		!-----------------------------------------------------------------
+		posX = startX
+		posY = startY
+		posX_list = startX+10
+
+			!	마감 유형 
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_infield	"bClosure", posX, posY, 50, 15,
+						7, "", 2, 0, 0, 0, 0, 0,
+						1, "마감",
+						2, "마감"
+			posY = posY + spaceY_list						
+
+			img_w = 0		!	이미지 가로 픽셀 
+			img_h = 0		! 	이미지 세로 픽셀
+			ui_style 	0,	0
+			ui_outfield	"유형",	posX_list, posY			
+			ui_infield "iClosure_type", posX+40, posY-3, 100, 22, 
+						2, "", 3, 1, 
+						0, 0, img_w, img_h, 
+						TYPE1, stClosure_type_arr[TYPE1], 
+						TYPE2, stClosure_type_arr[TYPE2], 
+						TYPE3, stClosure_type_arr[TYPE3]
+
+			posY = posY + spaceY_title
+
+
+			!	마감 회전 수 
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"마감 회전 수",	posX, posY	
+			posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"외부",	posX_list, posY
+				ui_infield 	"iClosure_num", posX_list + 30, posY-4, 50, 20
+				ui_outfield	"내부",	posX_list + 100, posY
+				ui_infield 	"iClosure_num_in", posX_list + 30 + 100, posY-4, 50, 20							
+			
+			posY = posY + spaceY_title
+
+
+		ui_separator	startX, separator_posY, UI_max_width-startX, separator_posY
+		posX_2 = UI_max_width/2 + startX
+		posY_2 = startY
+		posX_list_2 = posX_2 + 10
+
+
+			!	별도 외부 마감
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_infield	"bClosure_ex", posX_2, posY_2, 100, 15,
+						7, "", 2, 0, 0, 0, 0, 0,
+						1, "별도 외부 마감",
+						2, "별도 외부 마감"
+			posY_2 = posY_2 + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"두께(mm)",	posX_list_2, posY_2
+				ui_infield 	"mClosure_ex_thk", posX_list_2 + 55, posY_2-4, 50, 20
+
+
+		ui_separator	UI_max_width/2, startY, UI_max_width/2, separator_posY-5
+		posY = separator_posY
+		posY = posY + 10
+
+
+
+		!	2D / 3D 표현 
+		!-----------------------------------------------------------------
+		ui_style 	0,	1
+		ui_outfield	"2D / 3D 표현",	posX, posY	
+		posY = posY + spaceY_list
+
+		! 리스트 정의
+		iList_idx = iClosure_uipage
+		IList_num = 1
+		ui_listfield iList_idx, posX, posY, UI_max_width-posX*2, UI_max_height-posY-45, 0
+
+		if	not(bClosure_ex)	then
+
+			! 3D 표현
+			ui_listitem IList_num, iList_idx, "", 0, "", "3D 표현"				: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_pen",			1		: IList_num = IList_num+1
+
+		else
+
+			! 2D 표현
+			ui_listitem IList_num, iList_idx, "", 0, "", "2D 표현"				: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_ex_cont_pen",	1		: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_ex_fill", 		1		: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_ex_fill_pen", 	1		: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_ex_back_pen", 	1		: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_pen",			1		: IList_num = IList_num+1
+			
+			! 3D 표현
+			ui_listitem IList_num, iList_idx, "", 0, "", "3D 표현"				: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iClosure_ex_mat", 		1		: IList_num = IList_num+1	
+
+		endif
+		
+
+
+

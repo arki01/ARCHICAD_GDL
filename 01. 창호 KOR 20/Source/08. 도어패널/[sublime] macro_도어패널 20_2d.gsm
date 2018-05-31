@@ -1,0 +1,118 @@
+
+!======================================================================================================
+!	창호 20 - 도어패널(Sub)
+!======================================================================================================
+!   DATE : 2018/01/18 THU
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+define style "style_test_2d"	"맑은 고딕", 1, 1, 0
+set style	"style_test_2d"
+
+if	bTest	then
+	! project2	3, 270, 2
+	! text2	0, 0, stMyname
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	2D 심볼
+!----------------------------------------------------------------------------------------------------
+
+	!	핫스팟
+	!----------------------------------------------------------------------------------------------------
+
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	!	최하단에 있는 프레임만 보이도록 한다.
+	!	추후 요청사항 있을시 추가 개발 할 것.
+	if	iDetail_2d = DETAIL_2D_SIMPLE	then
+		
+		if	iDoor_dir = LEFT_DOOR	then	
+			gosub	"door_shape_2d"
+			gosub	"door_shape_open_2d"
+			pen	iSash_cont_pen
+			line2	0, 0, mWidth, 0
+		endif
+		if	iDoor_dir = RIGHT_DOOR	then
+			add2	mWidth, 0
+				mul2	-1, 1
+					gosub	"door_shape_2d"
+					gosub	"door_shape_open_2d"
+					pen	iSash_cont_pen
+					line2	0, 0, mWidth, 0
+				del	1
+			del	1
+		endif
+
+		if	iDoor_dir = LEFT_DOOR_180	then	
+			gosub	"door_shape_2d"
+			gosub	"door_shape_open_2d"
+			mul2	1, -1
+				gosub	"door_shape_2d"
+				gosub	"door_shape_open_2d"
+			del	1
+		endif
+		if	iDoor_dir = RIGHT_DOOR_180	then
+			add2	mWidth, 0
+				mul2	-1, 1
+					gosub	"door_shape_2d"
+					gosub	"door_shape_open_2d"
+				del	1			
+				mul2	1, -1
+					mul2	-1, 1
+						gosub	"door_shape_2d"
+						gosub	"door_shape_open_2d"
+					del	1
+				del	1				
+			del	1
+
+		endif
+	endif
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+"door_shape_2d"	:
+
+	put	0, 0, 1,
+		mWidth, 0, 1,
+		mWidth, mThick, 1,
+		0, mThick, 1,
+		0, 0, -1
+
+	pen	iSash_cont_pen
+	fill iSash_fill						
+	si = 1+0+4+8+16
+	rot2	-rDoor_ang_2d
+		poly2_b{2}		nsp/3, si, iSash_fill_pen, iSash_back_pen,
+						0, 0, 0,
+						get(nsp)
+	del	1
+
+return
+
+
+"door_shape_open_2d"	:
+
+	pen	iDoor_open_pen				
+	arc2	0, 0, mWidth, -rDoor_ang_2d, 0
+
+return
+

@@ -1,0 +1,112 @@
+
+!======================================================================================================
+!	창호 KOR 20
+!======================================================================================================
+!   DATE : 2018/02/07 WED
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	! n = request("name_of_macro", "", stMyname)
+	! project2	3, 270, 2
+
+	text2	0, -0.5, SYMB_ROTANGLE	
+	text2	0.5, -0.5, "SYMB_ROTANGLE"
+
+	text2	0, -1, SYMB_MIRRORED	
+	text2	0.5, -1, "SYMB_MIRRORED"		
+
+	text2	0, -1.5, WIDO_REVEAL_SIDE	
+	text2	0.5, -1.5, "WIDO_REVEAL_SIDE"
+endif
+
+if	bOrigin	then
+	circle2	0, 0, 0.05
+	hotspot2	0, 0
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+!	Setting Dialog 방향 바꿔줌 
+if	GLOB_CONTEXT = 5	then
+	if	WIDO_REVEAL_SIDE = 1 then mul2 -1, 1
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	창호
+!----------------------------------------------------------------------------------------------------
+unID = 1000
+
+	!	고정 핫스팟
+	!----------------------------------------------------------------------------------------------------
+
+
+	!	무빙 핫스팟
+	!----------------------------------------------------------------------------------------------------
+	!	창호 인입 설정
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		add2	0, -mDepth
+	endif
+	add2	-mWidth/2, 0
+		hotspot2 	0, 	0, 			unID, mOffset, 1 + 128		: unID = unID + 1			
+		hotspot2 	0, 	mOffset, 	unID, mOffset, 2			: unID = unID + 1		
+		hotspot2 	0, 	-1, 		unID, mOffset, 3			: unID = unID + 1		
+	del	1
+	add2	mWidth/2, 0
+		hotspot2 	0, 	0, 			unID, mOffset, 1 + 128		: unID = unID + 1			
+		hotspot2 	0, 	mOffset, 	unID, mOffset, 2			: unID = unID + 1		
+		hotspot2 	0, 	-1, 		unID, mOffset, 3			: unID = unID + 1		
+	del	1
+	if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+		del	1
+	endif
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	add2	-mWidth/2, mOffset
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			add2	0, -mDepth
+		endif
+		call	"macro_프레임(창호) 20.gsm"	parameters	all
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			del	1
+		endif
+	del	1
+
+
+	!	패널
+	!----------------------------------------------------------------------------------------------------
+	add2	-mSash_width/2, mOffset
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			add2	0, -mDepth
+		endif	
+		add2	0, mSash_offset
+			call	"macro_패널 20.gsm"	parameters	all
+		del	1
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			del	1
+		endif			
+	del	1
+
+
+	!	마감 + 개구부(Wall Hole)
+	!----------------------------------------------------------------------------------------------------
+	!	개구부 마감을 표현함,
+	if	bClosure	then
+		call	"macro_마감 20.gsm"	parameters	all
+	else
+		call	"macro_마감 20.gsm"	parameters	all		iClosure_num = 0,
+														iClosure_num_in = 0,
+														bClosure = 1
+	endif
+
+
+
+

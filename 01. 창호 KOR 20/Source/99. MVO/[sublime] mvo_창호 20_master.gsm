@@ -1,0 +1,65 @@
+
+!======================================================================================================
+!	창호 20 MVO
+!======================================================================================================
+!   DATE : 2017/10/25 WED
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	타입 정의
+!----------------------------------------------------------------------------------------------------
+!	'iDetail_setting' 인덱스
+SETTING_ALL = 1
+SETTING_SCALE = 2
+
+dim	stDetail_setting[]
+	stDetail_setting[SETTING_ALL] = "일괄 설정"		
+	stDetail_setting[SETTING_SCALE] = "스케일별 설정"		
+
+
+!	'MVO_iDetail_2d' 인덱스
+DETAIL_2D_SIMPLE = 1					
+DETAIL_2D_DETAIL = 2					
+DETAIL_2D_OFF = 3	
+
+dim	stDetail_2d[]
+	stDetail_2d[DETAIL_2D_SIMPLE] = "단순(기본)"		
+	stDetail_2d[DETAIL_2D_DETAIL] = "상세(실시)"		
+	stDetail_2d[DETAIL_2D_OFF] = "끔"	
+
+
+!	'MVO_iDetail_3d' 인덱스
+DETAIL_3D_SIMPLE = 1					
+DETAIL_3D_DETAIL = 2					
+DETAIL_3D_OFF = 3	
+
+dim	stDetail_3d[]
+	stDetail_3d[DETAIL_2D_SIMPLE] = "단순"		
+	stDetail_3d[DETAIL_2D_DETAIL] = "상세"		
+	stDetail_3d[DETAIL_2D_OFF] = "끔"			
+
+
+!	'iLine_show_2d' , 'iLine_show_3d' 인덱스
+LINE_SHOW = 1
+LINE_HIDE = 2
+
+dim	stLine_show[]
+	stLine_show[LINE_SHOW] = "보이기"
+	stLine_show[LINE_HIDE] = "숨기기"
+
+
+!	'iMarker_show' 인덱스
+MARKER_SHOW = 1
+MARKER_HIDE = 2
+
+dim	stMarker_show[]
+	stMarker_show[MARKER_SHOW] = "보이기"
+	stMarker_show[MARKER_HIDE] = "숨기기"

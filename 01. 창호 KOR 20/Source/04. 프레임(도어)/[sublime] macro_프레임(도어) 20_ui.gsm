@@ -1,0 +1,226 @@
+
+!======================================================================================================
+!	창호 20 - 프레임(도어)
+!======================================================================================================
+!	DATE : 2018/2/7 WED
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+
+
+!-----------------------------------------------------------------
+!	공통
+!-----------------------------------------------------------------
+! UI Size
+UI_max_width = 444
+UI_max_height = 296
+!  - Width : 444px
+!  - Height : 296px
+
+startX = 10
+startY = 5
+spaceY_title = 24			!	타이틀 간의 간격
+spaceY_list = 22			!	항목간의 간격
+
+separator_posY = 121		!	분리자 위치
+
+
+	ui_page	iFrame_uipage, -1, "프레임", "UImg_Tab_Frame"
+
+		!	프레임 설정
+		!-----------------------------------------------------------------
+		posX = startX
+		posY = startY
+		posX_list = startX+10
+
+			!	사이즈 설정
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"사이즈",	posX, posY	
+			posY = posY + spaceY_list
+
+			!	입력 부위 선택
+			_offsetX = 0
+			ui_style 	0,	0	
+			ui_radiobutton "bFrame_ui_sizetype", FRAME_SIZE_TOP, "상부", posX_list + _offsetX, posY-3, 40, 20	
+			ui_radiobutton "bFrame_ui_sizetype", FRAME_SIZE_BOT, "하부", posX_list + _offsetX + 45, posY-3, 40, 20		
+
+			ui_style 	0,	0			
+			ui_infield "bFrame_size_setting", posX_list + _offsetX +160, posY-3, 60, 20, 
+						7, "", 2, 0, 0, 0, 0, 0,
+						1, `상세설정`, 
+						2, `상세설정`	
+			posY = posY + spaceY_list	
+
+			_offsetX = 0
+			if	bFrame_ui_sizetype = FRAME_SIZE_TOP	then
+				if	not(bFrame_size_setting)	then
+					_boxW = 50
+					_boxH = 20
+					ui_style 	0,	0
+					ui_outfield	"W:",	posX_list +_offsetX, posY
+					ui_infield 	"mFrame_top_w", posX_list +_offsetX +15, posY-4, _boxW, _boxH			
+
+					ui_outfield	"D:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mDepth", posX_list +_offsetX +15 +(_boxW+25), posY-4, _boxW, _boxH
+					posY = posY + spaceY_list	
+				else
+					_boxW = 50
+					_boxH = 20
+					ui_style 	0,	0
+					ui_outfield	"W:",	posX_list +_offsetX, posY
+					ui_infield 	"mFrame_top_w", posX_list +_offsetX +15, posY-4, _boxW, _boxH			
+					ui_outfield	"W1:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mFrame_top_w1", posX_list +_offsetX +20 +(_boxW+25), posY-4, _boxW, _boxH	
+					ui_outfield	"W2:",	posX_list +_offsetX +(_boxW+25)*2, posY
+					ui_infield 	"mFrame_top_w2", posX_list +_offsetX +20 +(_boxW+25)*2, posY-4, _boxW, _boxH						
+					posY = posY + spaceY_list
+
+					ui_outfield	"D:",	posX_list +_offsetX, posY
+					ui_infield 	"mDepth", posX_list +_offsetX +15, posY-4, _boxW, _boxH
+					ui_outfield	"D1:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mFrame_top_d1", posX_list +_offsetX +20 +(_boxW+25), posY-4, _boxW, _boxH	
+					ui_outfield	"D2:",	posX_list +_offsetX +(_boxW+25)*2, posY
+					ui_infield 	"mFrame_top_d2", posX_list +_offsetX +20 +(_boxW+25)*2, posY-4, _boxW, _boxH
+					posY = posY + spaceY_list	
+
+					ui_outfield	"D3:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mFrame_top_d3", posX_list +_offsetX +20 +(_boxW+25), posY-4, _boxW, _boxH											
+					posY = posY + spaceY_list	
+				endif
+
+				!	이미지
+				_posx = 265
+				_posy = 15			
+				gosub	"img_framesize_top"				
+			endif
+
+			if	bFrame_ui_sizetype = FRAME_SIZE_BOT	then
+				if	not(bFrame_size_setting)	then
+					_boxW = 50
+					_boxH = 20
+					ui_style 	0,	0
+					ui_outfield	"W:",	posX_list +_offsetX, posY
+					ui_infield 	"mFrame_bot_w", posX_list +_offsetX +15, posY-4, _boxW, _boxH			
+
+					ui_outfield	"D:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mDepth", posX_list +_offsetX +15 +(_boxW+25), posY-4, _boxW, _boxH
+					posY = posY + spaceY_list	
+				else
+					_boxW = 50
+					_boxH = 20
+					ui_style 	0,	0
+					ui_outfield	"W:",	posX_list +_offsetX, posY
+					ui_infield 	"mFrame_bot_w", posX_list +_offsetX +15, posY-4, _boxW, _boxH			
+					ui_outfield	"W1:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mFrame_bot_w1", posX_list +_offsetX +20 +(_boxW+25), posY-4, _boxW, _boxH	
+					ui_outfield	"W2:",	posX_list +_offsetX +(_boxW+25)*2, posY
+					ui_infield 	"mFrame_bot_w2", posX_list +_offsetX +20 +(_boxW+25)*2, posY-4, _boxW, _boxH						
+					posY = posY + spaceY_list
+
+					ui_outfield	"D:",	posX_list +_offsetX, posY
+					ui_infield 	"mDepth", posX_list +_offsetX +15, posY-4, _boxW, _boxH
+					ui_outfield	"D1:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mFrame_top_d1", posX_list +_offsetX +20 +(_boxW+25), posY-4, _boxW, _boxH	
+					ui_outfield	"D2:",	posX_list +_offsetX +(_boxW+25)*2, posY
+					ui_infield 	"mFrame_top_d2", posX_list +_offsetX +20 +(_boxW+25)*2, posY-4, _boxW, _boxH
+					posY = posY + spaceY_list	
+
+					ui_outfield	"D3:",	posX_list +_offsetX +(_boxW+25), posY
+					ui_infield 	"mFrame_bot_d3", posX_list +_offsetX +20 +(_boxW+25), posY-4, _boxW, _boxH											
+					posY = posY + spaceY_list	
+				endif
+
+				!	이미지
+				_posx = 265
+				_posy = 15			
+				gosub	"img_framesize_bot"		
+			endif
+
+
+
+		! ui_separator	startX, separator_posY, UI_max_width-startX, separator_posY
+		posY = separator_posY
+		posY = posY + 10
+
+
+		!	2D / 3D 표현 
+		!-----------------------------------------------------------------
+		ui_style 	0,	1
+		ui_outfield	"2D / 3D 표현",	posX, posY	
+		posY = posY + spaceY_list
+
+		! 리스트 정의
+		iList_idx = iFrame_uipage
+		IList_num = 1
+		ui_listfield iList_idx, posX, posY, UI_max_width-posX*2, UI_max_height-posY-45, 0
+
+		! 2D 표현
+		ui_listitem IList_num, iList_idx, "", 0, "", "2D 표현"				: IList_num = IList_num+1
+		ui_listitem IList_num, iList_idx, "bFrame_pen_setting",	1			: IList_num = IList_num+1
+		if	bFrame_pen_setting	then
+			ui_listitem IList_num, iList_idx, "iFrame_cont_pen",	1			: IList_num = IList_num+1
+			ui_listitem IList_num, iList_idx, "iFrame_sect_pen",	1			: IList_num = IList_num+1		
+			ui_listitem IList_num, iList_idx, "iFrame_pen",	1					: IList_num = IList_num+1
+		else
+			ui_listitem IList_num, iList_idx, "iFrame_all_pen",	1			: IList_num = IList_num+1
+		endif
+
+		! 3D 표현
+		ui_listitem IList_num, iList_idx, "", 0, "", "3D 표현"				: IList_num = IList_num+1
+		ui_listitem IList_num, iList_idx, "iFrame_mat", 1					: IList_num = IList_num+1	
+
+	
+
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+
+!------------------------------------------------------------------------------------------------------
+"img_framesize_top"	:
+!------------------------------------------------------------------------------------------------------
+	
+	ui_pict "UImg_Door_FrameSize_Top.png", _posx, _posy, 166.7, 105, 1+2
+
+	ui_style 	0,	0			
+	ui_outfield	"D1",	_posx+12, _posy+65
+	ui_outfield	"D2",	_posx+11+40, _posy+65
+	ui_outfield	"D3",	_posx+11+40+40, _posy+65
+	ui_outfield	"D",	_posx+11+43, _posy+65+21
+
+	ui_outfield	"W1",	_posx+120, _posy+24
+	ui_outfield	"W2",	_posx+120, _posy+24+20
+	ui_outfield	"W",	_posx+120+28, _posy+35
+
+return
+
+
+!------------------------------------------------------------------------------------------------------
+"img_framesize_bot"	:
+!------------------------------------------------------------------------------------------------------
+	
+	ui_pict "UImg_Door_FrameSize_Bot.png", _posx, _posy, 166.7, 105, 1+2
+
+	ui_style 	0,	0			
+	ui_outfield	"D1",	_posx+12, _posy+28
+	ui_outfield	"D2",	_posx+11+40, _posy+28
+	ui_outfield	"D3",	_posx+11+40+40, _posy+28
+	ui_outfield	"D",	_posx+11+43, _posy+28-21
+
+	ui_outfield	"W1",	_posx+120, _posy+69
+	ui_outfield	"W2",	_posx+120, _posy+69-20
+	ui_outfield	"W",	_posx+120+28, _posy+60
+
+return
+

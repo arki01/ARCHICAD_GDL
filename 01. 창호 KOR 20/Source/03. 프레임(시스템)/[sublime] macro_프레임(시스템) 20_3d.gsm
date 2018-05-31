@@ -1,0 +1,198 @@
+
+!======================================================================================================
+!	창호 20 - 프레임
+!======================================================================================================
+!	DATE : 2017/8/18 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+define style "style_test_3d"	"맑은 고딕", 50, 1, 0
+set style	"style_test_3d"
+if	GLOB_VIEW_TYPE = 3	then
+	!	text		 0.001, 0, stMyname
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통 
+!----------------------------------------------------------------------------------------------------
+unID = 1000
+
+define style "style_index"	"맑은 고딕", 50, 1, 0
+define style "style_text"	"맑은 고딕", 50, 5, 0
+
+!----------------------------------------------------------------------------------------------------
+!	형상
+!----------------------------------------------------------------------------------------------------
+resol iResol
+pen	iFrame_pen
+
+	!	단순 표현
+	!----------------------------------------------------------------------------------------------------
+	if	iDetail_3d = DETAIL_3D_SIMPLE | iDetail_3d = DETAIL_3D_DETAIL	then
+
+		!	핫스팟
+		!----------------------------------------------------------------------------------------------------
+		hotspot	0, 0, 0, 			unID	: unID = unID + 1
+		hotspot	mWidth, 0, 0, 		unID	: unID = unID + 1	
+		hotspot	mWidth, 0, mHeight, unID	: unID = unID + 1
+		hotspot	0, 0, mHeight,		unID	: unID = unID + 1	
+
+		if	iFrame_setting = FRAME_SIZE_ONCE		then	addy	mFrame_once_d
+		if	iFrame_setting = FRAME_SIZE_VERTHORI	then	addy	mFrame_vert_d
+			hotspot	0, 0, 0, 			unID	: unID = unID + 1
+			hotspot	mWidth, 0, 0, 		unID	: unID = unID + 1	
+			hotspot	mWidth, 0, mHeight, unID	: unID = unID + 1
+			hotspot	0, 0, mHeight,		unID	: unID = unID + 1	
+		if	iFrame_setting = FRAME_SIZE_ONCE		then	del	1
+		if	iFrame_setting = FRAME_SIZE_VERTHORI	then	del	1
+
+		!	무빙 핫스팟
+		!----------------------------------------------------------------------------------------------------
+		!	수직프레임 이동
+		if	GLOB_VIEW_TYPE = 3	then
+			for i = 2	to	iCol_num-1
+				addx	mCol_pos[i-1]
+					hotspot 	0, 				0,	0, 		unID, mCol_dist[i], 1 + 128		: unID = unID + 1			
+					hotspot 	mCol_dist[i], 	0,	0,		unID, mCol_dist[i], 2			: unID = unID + 1		
+					hotspot 	-1, 			0,	0,		unID, mCol_dist[i], 3			: unID = unID + 1	
+				del	1		
+			next i
+		endif
+
+		!	수평프레임 이동
+		for i = 2	to	iRow_num-1
+			addz	mRow_pos[i-1]
+				hotspot 	0, 	0,	0, 				unID, mRow_dist[i], 1 + 128		: unID = unID + 1			
+				hotspot 	0,	0,	mRow_dist[i],	unID, mRow_dist[i], 2			: unID = unID + 1		
+				hotspot 	0,	0,	-1,				unID, mRow_dist[i], 3			: unID = unID + 1	
+			del	1		
+		next i
+
+
+		!	프레임
+		!----------------------------------------------------------------------------------------------------
+		if	iFrame_setting = FRAME_SIZE_ONCE	then		
+			mFrame_space_w = (mWidth-mFrame_once_w)/(iCol_num-1)
+			mFrame_space_d = (mHeight-mFrame_once_w)/(iRow_num-1)
+		endif
+
+		!	수직 프레임
+		if	not(bFrame_hide_vert_all)	then	gosub	"frame_vert"
+
+		!	수평 프레임
+		if	not(bFrame_hide_hori_all)	then	gosub	"frame_hori"
+
+	endif
+
+
+	!	상세 표현
+	!----------------------------------------------------------------------------------------------------
+	if	iDetail_3d = DETAIL_3D_DETAIL	then
+		! add		mWidth/2, 0, mHeight/2
+		! 	rotx	90	
+		! 		set style	"style_text"
+		! 		material iText_mat
+		! 		text	0.001, 0, "상세표현 개발 예정"
+		! 	del	1
+		! del	1
+	endif
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+"frame_shape"	:
+
+	if	bFrame_origin	then
+		hotspot 0, 0, 0
+	endif
+
+	roty	-mFrmAng_sub
+		roty	90
+			add	-mFrmW_sub/2, 0, 0
+				material iFrame_mat
+				sect_fill	iFrame_sect_fill, iFrame_sect_back_pen, iFrame_sect_fill_pen, iFrame_sect_pen
+				block	mFrmW_sub, mFrmD_sub, mFrmL_sub
+				if	bFrame_idx	then
+					gosub	"frame_index"
+				endif
+			del	1
+		del	1
+	del	1
+
+return
+
+
+"frame_vert"	:
+
+	for i = 1	to	iFrame_num_vert
+		if	not(bFrame_hide_vert[i])	then
+			mFrmL_sub = mFrame_len_vert[i] + mFrame_len_vert_ext[i][POS_FRONT] + mFrame_len_vert_ext[i][POS_END]
+			if	mFrame_len_vert[i] > EPS	then
+				stFrm_idx = "V"+str(i,1,0)
+				mFrmW_sub = mFrame_size_vert[i][W]
+				mFrmD_sub = mFrame_size_vert[i][D]
+				mFrmAng_sub = 90							!	수직 프레임 
+				addz	-mFrame_len_vert_ext[i][POS_FRONT]
+					addz	mFrame_pos_vert[i][POSZ]
+						addx	mFrame_pos_vert[i][POSX]
+							gosub	"frame_shape"
+						del	1
+					del	1
+				del	1
+			endif
+		endif
+	next i
+
+return
+
+
+"frame_hori"	:
+
+	for i = 1	to	iFrame_num_hori
+		if	not(bFrame_hide_hori[i])	then
+			mFrmL_sub = mFrame_len_hori[i]
+			if	mFrame_len_hori[i] > EPS	then
+				stFrm_idx = "H"+str(i,1,0)
+				mFrmW_sub = mFrame_size_hori[i][W]
+				mFrmD_sub = mFrame_size_hori[i][D]
+				mFrmAng_sub = 0								!	수평 프레임 
+				addx	mFrame_pos_hori[i][POSX]
+					addz	mFrame_pos_hori[i][POSZ]
+						gosub	"frame_shape"
+					del	1
+				del	1
+			endif
+		endif
+	next i
+
+return
+
+
+"frame_index"	:
+	
+	set style	"style_index"
+	if	GLOB_VIEW_TYPE = 3	then 
+		roty	-90	
+			material iText_mat
+			text	0.001, 0, stFrm_idx
+		del	1
+	endif	
+
+return
+
+

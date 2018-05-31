@@ -1,0 +1,137 @@
+
+!======================================================================================================
+!	샤시패널 20
+!======================================================================================================
+!	DATE : 2017/8/18 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+mTextH = 50
+define style "style_test_3d"	"맑은 고딕", mTextH, 1, 0
+set style	"style_test_3d"
+
+if	bTest	then
+	if	GLOB_VIEW_TYPE = 3	then
+		! text		 0.001, 0, stMyname
+	endif
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	형상
+!----------------------------------------------------------------------------------------------------
+resol iResol
+pen	iSash_pen
+
+	!	핫스팟
+	!----------------------------------------------------------------------------------------------------
+	! unID = 1000
+	! hotspot	0, 0, 0, 			unID	: unID = unID + 1
+	! hotspot	mWidth, 0, 0, 		unID	: unID = unID + 1	
+	! hotspot	mWidth, 0, mHeight, 	unID	: unID = unID + 1
+	! hotspot	0, 0, mHeight,		unID	: unID = unID + 1
+
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	if	_bFrame	then
+		material iFrame_mat
+		sect_fill	iSash_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iSash_sect_pen
+
+		si = 1+2+4+8
+		put	0, 0, si,
+			mWidth, 0, si,
+			mWidth, mHeight, si,
+			0, mHeight, si,
+			0, 0, -1,
+
+			mFrame_w, mFrame_w, si,
+			mWidth-mFrame_w, mFrame_w, si,
+			mWidth-mFrame_w, mHeight-mFrame_w, si,
+			mFrame_w, mHeight-mFrame_w, si,
+			mFrame_w, mFrame_w, -1
+
+		addy	mFrame_d
+			rotx	90
+				prism_	nsp/3, mFrame_d,
+						get(nsp)
+			del	1
+		del	1
+	endif
+
+
+
+	!	유리 
+	!----------------------------------------------------------------------------------------------------
+	if	_bGlass	then
+
+		material iGlass_mat
+		sect_fill	iGlass_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iGlass_sect_pen
+
+		if	iGlass_type = GLASS_SINGLE 	then
+			addy	mFrame_d/2-mGlass_thk/2
+				gosub	"Glass_shape"
+			del	1
+		endif
+
+		if	iGlass_type = GLASS_DOUBLE 	then
+			addy	mFrame_d/2 - (mGlass_dis+mGlass_thk)/2 - mGlass_thk/2
+				gosub	"Glass_shape"
+				addy	mGlass_dis + mGlass_thk
+					gosub	"Glass_shape"
+				del	1
+			del	1
+		endif
+
+		if	iGlass_type = GLASS_TRIPLE 	then
+			addy	mFrame_d/2 - (mGlass_dis+mGlass_thk) - mGlass_thk/2
+				gosub	"Glass_shape"
+				addy	mGlass_dis + mGlass_thk
+					gosub	"Glass_shape"
+					addy	mGlass_dis + mGlass_thk
+						gosub	"Glass_shape"
+					del	1						
+				del	1
+			del	1
+		endif
+
+	endif
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+!---------------------------------------------------------------------------------
+"Glass_shape"	:
+!---------------------------------------------------------------------------------
+
+	if	_bFrame	then
+		mGlass_w = mWidth-mFrame_w*2
+		mGlass_d = mHeight-mFrame_w*2
+		addz	mFrame_w
+			addx	mFrame_w			
+				block	mGlass_w, mGlass_thk, mGlass_d 
+			del	1
+		del	1		
+	else
+		mGlass_w = mWidth
+		mGlass_d = mHeight
+		block	mGlass_w, mGlass_thk, mGlass_d 
+	endif 
+
+
+return

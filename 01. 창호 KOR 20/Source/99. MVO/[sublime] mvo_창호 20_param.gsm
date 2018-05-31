@@ -1,0 +1,128 @@
+
+!======================================================================================================
+!	창호 20 MVO
+!======================================================================================================
+!   DATE : 2017/10/25 WED
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 정의
+!----------------------------------------------------------------------------------------------------
+values{2}	"iDetail_setting",
+			SETTING_ALL, stDetail_setting[SETTING_ALL], 
+			SETTING_SCALE, stDetail_setting[SETTING_SCALE]
+
+
+values{2}	"MVO_iDetail_2d",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+
+values{2}	"MVO_iDetail_3d",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+
+values{2}	"MVO_iDetail_2d_1",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_2",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_3",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_4",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_5",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_6",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_7",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_8",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]						
+values{2}	"MVO_iDetail_2d_9",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]
+values{2}	"MVO_iDetail_2d_10",
+			DETAIL_2D_SIMPLE, stDetail_2d[DETAIL_2D_SIMPLE], 
+			DETAIL_2D_DETAIL, stDetail_2d[DETAIL_2D_DETAIL], 
+			DETAIL_2D_OFF, stDetail_2d[DETAIL_2D_OFF]		
+
+values{2}	"MVO_iDetail_3d_1",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_2",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_3",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_4",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_5",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_6",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_7",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_8",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_9",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+values{2}	"MVO_iDetail_3d_10",
+			DETAIL_3D_SIMPLE, stDetail_3d[DETAIL_3D_SIMPLE], 
+			DETAIL_3D_DETAIL, stDetail_3d[DETAIL_3D_DETAIL], 
+			DETAIL_3D_OFF, stDetail_3d[DETAIL_3D_OFF]
+
+
+!	마커 보이기
+values{2}	"iMarker_show",
+			MARKER_SHOW, stMarker_show[MARKER_SHOW], 
+			MARKER_HIDE, stMarker_show[MARKER_HIDE]
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 범위 정의
+!----------------------------------------------------------------------------------------------------				
+values	"iDetail_scale_num"	range [1, 10]
+
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------

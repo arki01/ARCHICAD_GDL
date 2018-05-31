@@ -1,0 +1,1414 @@
+!
+!!======================================================================================================
+!!	창호 20 - 프레임
+!!======================================================================================================
+!!	DATE : 2017/8/18 FRI
+!!	VER : AC 20
+!!	DEV : JO HYUNG JUN
+!
+!
+!
+!!----------------------------------------------------------------------------------------------------
+!!	매크로 연동
+!!----------------------------------------------------------------------------------------------------
+!call	"macro_표현 20.gsm"			parameters	all
+!
+!
+!!----------------------------------------------------------------------------------------------------
+!!	변수 정의
+!!----------------------------------------------------------------------------------------------------
+!	!	사이즈
+!	!------------------------------------------------------------------------------------------------------
+!	values{2}	"iFrame_setting",
+!				FRAME_SIZE_ONCE, stFrame_setting[FRAME_SIZE_ONCE],
+!				FRAME_SIZE_VERTHORI, stFrame_setting[FRAME_SIZE_VERTHORI],
+!				FRAME_SIZE_INOUT, stFrame_setting[FRAME_SIZE_INOUT]		
+!
+!
+!!----------------------------------------------------------------------------------------------------
+!!	변수 범위 정의
+!!----------------------------------------------------------------------------------------------------				
+!	!	사이즈
+!	!------------------------------------------------------------------------------------------------------
+!	values  "A" range [0.05, 10.000]
+!	values  "B" range [0.05, 10.000]
+!	values  "mWidth" range [0.05, 10.000]
+!	values  "mHeight" range [0.05, 10.000]
+!
+!	values	"iCol_num"	range [2, 6]
+!	values	"iRow_num"	range [2, 6]
+!
+!	mFrame_size_min = 0.010
+!	mFrame_size_max = 0.300
+!	values	"mFrame_once_w" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_once_d" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_vert_w" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_vert_d" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_hori_w" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_hori_d" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_vert_w_in" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_vert_d_in" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_hori_w_in" range [mFrame_size_min, mFrame_size_max]
+!	values	"mFrame_hori_d_in" range [mFrame_size_min, mFrame_size_max]
+!
+!
+!
+!!----------------------------------------------------------------------------------------------------
+!!	변수 연동
+!!----------------------------------------------------------------------------------------------------		
+!	!	사이즈
+!	!------------------------------------------------------------------------------------------------------
+!	if	GLOB_MODPAR_NAME = "A"	then
+!		mWidth = A
+!		parameters	mWidth = A
+!	endif
+!	if	GLOB_MODPAR_NAME = "B"	then
+!		mHeight = B
+!		parameters	mHeight = B
+!	endif
+!	if	GLOB_MODPAR_NAME = "mWidth"	then
+!		A = mWidth
+!		parameters	A = mWidth
+!	endif
+!	if	GLOB_MODPAR_NAME = "mHeight"	then
+!		B = mHeight
+!		parameters	B = mHeight
+!	endif
+!
+!
+!	!	레이아웃
+!	!------------------------------------------------------------------------------------------------------
+!	!	레이아웃 병합
+!	if	iRow_num >= 3	then
+!		values	"iCol_combine_num" range [0, iCol_num-1]
+!	else
+!		iCol_combine_num = 0
+!		parameters	iCol_combine_num = iCol_combine_num
+!		lock	"iCol_combine_num"
+!	endif
+!	if	iCol_num >= 3	then
+!		values	"iRow_combine_num" range [0, iRow_num-1]
+!	else
+!		iRow_combine_num = 0
+!		parameters	iRow_combine_num = iRow_combine_num
+!		lock	"iRow_combine_num"
+!	endif
+!	
+!	if	GLOB_MODPAR_NAME = "iCol_combine_num" & iCol_combine_num > 0 	then	
+!		iRow_combine_num = 0
+!		parameters iRow_combine_num = 0
+!	endif
+!	if	GLOB_MODPAR_NAME = "iRow_combine_num" & iRow_combine_num > 0 	then	
+!		iCol_combine_num = 0
+!		parameters iCol_combine_num = 0
+!	endif
+!
+!	if	GLOB_MODPAR_NAME = "iRow_num" | GLOB_MODPAR_NAME = "iCol_num"	then
+!		iRow_combine_num = 0
+!		iCol_combine_num = 0
+!		parameters iRow_combine_num = 0		
+!		parameters iCol_combine_num = 0
+!	endif
+!
+!
+!	!	2D 표현
+!	!------------------------------------------------------------------------------------------------------
+!	if	not(bFrame_pen_setting)	then
+!		parameters 	iFrame_cont_pen = iFrame_all_pen,
+!					iFrame_sect_pen = iFrame_all_pen,
+!					iFrame_pen = iFrame_all_pen
+!	else
+!		parameters 	iFrame_all_pen = iFrame_cont_pen
+!	endif
+!
+!
+!
+!!----------------------------------------------------------------------------------------------------
+!!	연산
+!!----------------------------------------------------------------------------------------------------
+!
+!	!	프레임 갯수
+!	!------------------------------------------------------------------------------------------------------
+!	if	GLOB_MODPAR_NAME = "iCol_num" | GLOB_MODPAR_NAME = "iRow_num" then
+!		iFrame_num_vert = iCol_num*(iRow_num-1)
+!		iFrame_num_hori = iRow_num*(iCol_num-1)
+!		parameters	iFrame_num_vert = iFrame_num_vert
+!		parameters	iFrame_num_hori = iFrame_num_hori
+!	endif
+!
+!
+!	!	내/외부 프레임 확인
+!	!------------------------------------------------------------------------------------------------------
+!	FRAME_OUT = 1			!	외부 = 1
+!	FRAME_IN = 2			!	내부 = 0
+!
+!	dim	iFrame_inout_vert[]
+!	dim	iFrame_inout_hori[]
+!
+!	gosub	"frame_inout_calc"
+!
+!
+!	if	GLOB_MODPAR_NAME = "mFrame_once_w" | GLOB_MODPAR_NAME = "mFrame_once_d" \
+!		| GLOB_MODPAR_NAME = "mFrame_vert_w" | GLOB_MODPAR_NAME = "mFrame_vert_d" | GLOB_MODPAR_NAME = "mFrame_hori_w" | GLOB_MODPAR_NAME = "mFrame_hori_d" \
+!		| GLOB_MODPAR_NAME = "mFrame_vert_w_in" | GLOB_MODPAR_NAME = "mFrame_vert_d_in" | GLOB_MODPAR_NAME = "mFrame_hori_w_in" | GLOB_MODPAR_NAME = "mFrame_hori_d_in" \
+!		| GLOB_MODPAR_NAME = "iFrame_setting" \ 
+!		| GLOB_MODPAR_NAME = "A" | GLOB_MODPAR_NAME = "B" | GLOB_MODPAR_NAME = "mWidth" | GLOB_MODPAR_NAME = "mHeight"	then
+!		bFrame_size_calc = 1
+!	endif
+!
+!	if	bFrame_size_calc	then
+!
+!		!	사이즈 입력값 동기화
+!		!------------------------------------------------------------------------------------------------------
+!		! if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		! 	mFrame_once_w = mFrame_vert_w
+!		! 	mFrame_once_d = mFrame_hori_d
+!		! 	parameters	mFrame_once_w = mFrame_once_w
+!		! 	parameters	mFrame_once_d = mFrame_once_d			
+!		! endif
+!		! if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		! 	mFrame_once_w = mFrame_vert_w
+!		! 	mFrame_once_d = mFrame_hori_d
+!		! 	mFrame_vert_w_in = mFrame_vert_w
+!		! 	mFrame_hori_w_in = mFrame_hori_w
+!		! 	mFrame_vert_d_in = mFrame_vert_d
+!		! 	mFrame_hori_d_in = mFrame_hori_d
+!		! 	parameters	mFrame_once_w = mFrame_once_w
+!		! 	parameters	mFrame_once_d = mFrame_once_d
+!		! 	parameters	mFrame_vert_w = mFrame_vert_w
+!		! 	parameters	mFrame_hori_w = mFrame_hori_w
+!		! 	parameters	mFrame_vert_d = mFrame_vert_d
+!		! 	parameters	mFrame_hori_d = mFrame_hori_d				
+!		! endif
+!		! if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		! 	mFrame_vert_w = mFrame_once_w
+!		! 	mFrame_hori_w = mFrame_once_w
+!		! 	mFrame_vert_w_in = mFrame_once_w
+!		! 	mFrame_hori_w_in = mFrame_once_w
+!		! 	mFrame_vert_d = mFrame_once_d
+!		! 	mFrame_hori_d = mFrame_once_d
+!		! 	mFrame_vert_d_in = mFrame_once_d
+!		! 	mFrame_hori_d_in = mFrame_once_d	
+!		! 	parameters	mFrame_vert_w = mFrame_vert_w
+!		! 	parameters	mFrame_hori_w = mFrame_hori_w
+!		! 	parameters	mFrame_vert_w_in = mFrame_vert_w_in
+!		! 	parameters	mFrame_hori_w_in = mFrame_hori_w_in
+!		! 	parameters	mFrame_vert_d = mFrame_vert_d
+!		! 	parameters	mFrame_hori_d = mFrame_hori_d
+!		! 	parameters	mFrame_vert_d_in = mFrame_vert_d_in
+!		! 	parameters	mFrame_hori_d_in = mFrame_hori_d_in	
+!		! endif
+!
+!
+!		!	사이즈 변경
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_size_insert"
+!		parameters	mFrame_size_vert = mFrame_size_vert
+!		parameters	mFrame_size_hori = mFrame_size_hori	
+!
+!
+!		!	사이즈 변경에 따른 프레임 위치 변경
+!		!------------------------------------------------------------------------------------------------------
+!			!	1. 이전 사이즈 확인
+!			!------------------------------------------------------------------------------------------------------
+!			if	iFrame_setting = FRAME_SIZE_ONCE	then
+!				mFrmW_vert_now = mFrame_once_w
+!				mFrmW_vert_in_now = mFrame_once_w
+!			endif
+!			if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!				mFrmW_vert_now = mFrame_vert_w
+!				mFrmW_vert_in_now = mFrame_vert_w			
+!			endif
+!			if	iFrame_setting = FRAME_SIZE_INOUT	then
+!				mFrmW_vert_now = mFrame_vert_w
+!				mFrmW_vert_in_now = mFrame_vert_w_in							
+!			endif
+!
+!
+!			!	2. 사이즈에 따른 프레임 위치 변경
+!			!------------------------------------------------------------------------------------------------------
+!			gosub	"frame_size_to_pos_calc"
+!			parameters	mFrame_pos_vert = mFrame_pos_vert
+!			parameters	mFrame_pos_hori = mFrame_pos_hori
+!
+!
+!			!	3. 프레임 위치에 따른 간격 변경
+!			!------------------------------------------------------------------------------------------------------
+!			gosub	"frame_pos_calc"
+!			parameters	mCol_pos = mCol_pos
+!			parameters	mRow_pos = mRow_pos
+!			parameters	mCol_pos_temp = mCol_pos
+!			parameters	mRow_pos_temp = mRow_pos
+!
+!			gosub	"frame_dist_calc"
+!			parameters	mCol_dist = mCol_dist
+!			parameters	mRow_dist = mRow_dist
+!			parameters	mCol_dist_temp = mCol_dist
+!			parameters	mRow_dist_temp = mRow_dist
+!
+!
+!			!	4. 사이즈 현재값 저장
+!			!------------------------------------------------------------------------------------------------------
+!			if	iFrame_setting = FRAME_SIZE_ONCE	then
+!				parameters	mFrame_once_w_temp = mFrame_once_w
+!			endif
+!			if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!				parameters	mFrame_vert_w_temp = mFrame_vert_w
+!				parameters	mFrame_hori_w_temp = mFrame_hori_w
+!			endif	
+!			if	iFrame_setting = FRAME_SIZE_INOUT	then
+!				parameters	mFrame_vert_w_temp = mFrame_vert_w
+!				parameters	mFrame_hori_w_temp = mFrame_hori_w
+!				parameters	mFrame_vert_w_in_temp = mFrame_vert_w_in
+!				parameters	mFrame_hori_w_in_temp = mFrame_hori_w_in				
+!			endif
+!
+!		!	프레임 사이즈 변경에 따른 길이 연산
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_vert_len_calc"
+!		parameters	mFrame_len_vert = mFrame_len_vert
+!
+!		gosub	"frame_hori_len_calc"
+!		parameters	mFrame_len_hori = mFrame_len_hori
+!
+!	endif
+!
+!	!	프레임 N등분
+!	!------------------------------------------------------------------------------------------------------
+!	if	GLOB_MODPAR_NAME = "iCol_num" | GLOB_MODPAR_NAME = "iRow_num" then
+!		bFrame_divide_calc = 1
+!	endif
+!	if	GLOB_MODPAR_NAME = "A" | GLOB_MODPAR_NAME = "B" | GLOB_MODPAR_NAME = "mWidth" | GLOB_MODPAR_NAME = "mHeight" then
+!		if	iFrame_setting = FRAME_SIZE_ONCE	then
+!			mFrmW_vert = mFrame_once_w
+!			mFrmW_vert_in = mFrame_once_w
+!			mFrmW_hori = mFrame_once_w
+!			mFrmW_hori_in = mFrame_once_w		
+!		endif
+!		if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!			mFrmW_vert = mFrame_vert_w
+!			mFrmW_vert_in = mFrame_vert_w
+!			mFrmW_hori = mFrame_hori_w
+!			mFrmW_hori_in = mFrame_hori_w			
+!		endif
+!		if	iFrame_setting = FRAME_SIZE_INOUT	then
+!			mFrmW_vert = mFrame_vert_w
+!			mFrmW_vert_in = mFrame_vert_w_in
+!			mFrmW_hori = mFrame_hori_w
+!			mFrmW_hori_in = mFrame_hori_w_in	
+!		endif
+!
+!		if	(A-mFrmW_vert-mFrmW_vert_in/2)-mCol_pos[iCol_num-1] < mFrame_dist_min | (B-mFrmW_hori-mFrmW_hori_in/2)-mRow_pos[iRow_num-1] < mFrame_dist_min  	then
+!			bFrame_divide_calc = 1
+!		endif			
+!	endif
+!
+!	if	bFrame_divide_calc	then
+!		
+!		!	사이즈 변경
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_size_insert"
+!		parameters	mFrame_size_vert = mFrame_size_vert
+!		parameters	mFrame_size_hori = mFrame_size_hori	
+!
+!
+!		!	N등분시 위치
+!		!------------------------------------------------------------------------------------------------------
+!		if	iFrame_setting = FRAME_SIZE_ONCE	then		
+!			mFrame_space_w = (mWidth-mFrame_once_w)/(iCol_num-1)
+!			mFrame_space_d = (mHeight-mFrame_once_w)/(iRow_num-1)
+!		endif
+!		if	iFrame_setting = FRAME_SIZE_VERTHORI	then		
+!			mFrame_space_w = (mWidth-mFrame_vert_w)/(iCol_num-1)
+!			mFrame_space_d = (mHeight-mFrame_hori_w)/(iRow_num-1)
+!		endif
+!		if	iFrame_setting = FRAME_SIZE_INOUT	then		
+!			mFrame_space_w = (mWidth-mFrame_vert_w)/(iCol_num-1)
+!			mFrame_space_d = (mHeight-mFrame_hori_w)/(iRow_num-1)
+!		endif
+!
+!		!	수직 프레임
+!		gosub	"frame_vert_pos_calc"
+!		gosub	"frame_vert_n_pos_calc"
+!		parameters	mFrame_pos_vert = mFrame_pos_vert
+!
+!		!	수평 프레임
+!		gosub	"frame_hori_n_pos_calc"
+!		parameters	mFrame_pos_hori = mFrame_pos_hori
+!
+!		!	수직/수평 위치 입력 변환
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_pos_calc"
+!		parameters	mCol_pos = mCol_pos
+!		parameters	mRow_pos = mRow_pos
+!		parameters	mCol_pos_temp = mCol_pos
+!		parameters	mRow_pos_temp = mRow_pos
+!
+!		gosub	"frame_dist_calc"
+!		parameters	mCol_dist = mCol_dist
+!		parameters	mRow_dist = mRow_dist
+!		parameters	mCol_dist_temp = mCol_dist
+!		parameters	mRow_dist_temp = mRow_dist
+!
+!		!	N등분시 길이 연산 
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_vert_n_len_calc"
+!		gosub	"frame_vert_len_calc"
+!		parameters	mFrame_len_vert = mFrame_len_vert
+!
+!		gosub	"frame_hori_len_calc"
+!		parameters	mFrame_len_hori = mFrame_len_hori
+!
+!
+!		!	삭제한 프레임 설정 초기화
+!		!------------------------------------------------------------------------------------------------------
+!		for idx = 1	to	vardim1(bFrame_hide_vert)
+!			bFrame_hide_vert[idx] = 0
+!			bFrame_hide_hori[idx] = 0
+!		next idx
+!		parameters	bFrame_hide_vert = bFrame_hide_vert
+!		parameters	bFrame_hide_hori = bFrame_hide_hori
+!
+!	endif
+!
+!	!	핫스팟을 이용한 프레임 위치 조정
+!	!----------------------------------------------------------------------------------------------------	
+!	if	GLOB_MODPAR_NAME = "mCol_dist" | GLOB_MODPAR_NAME = "mRow_dist" 	then
+!		bFrame_pos_calc = 1
+!	endif
+!
+!	if	bFrame_pos_calc   then
+!
+!		!	프레임 간격 재연산
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_dist_re_calc"
+!
+!
+!		!	프레임 간격 수직/수평 위치 변경 범위 지정
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_hostpot_range_calc_new"
+!
+!		parameters	mCol_dist = mCol_dist
+!		parameters	mRow_dist = mRow_dist
+!		parameters	mCol_dist_temp = mCol_dist
+!		parameters	mRow_dist_temp = mRow_dist		
+!		parameters	mCol_pos = mCol_pos
+!		parameters	mRow_pos = mRow_pos
+!
+!		!	수직/수평 위치 변경
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_hotspot_pos_calc"
+!		parameters	mFrame_pos_vert = mFrame_pos_vert
+!		parameters	mFrame_pos_hori = mFrame_pos_hori
+!
+!
+!		!	수직/수평 위치 변경에 따른 길이 연산
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_vert_len_calc"
+!		parameters	mFrame_len_vert = mFrame_len_vert
+!		parameters	mFrame_len_vert_ext = mFrame_len_vert_ext
+!
+!		gosub	"frame_hori_len_calc"
+!		parameters	mFrame_len_hori = mFrame_len_hori
+!		parameters	mFrame_len_vert_ext = mFrame_len_vert_ext
+!
+!	endif
+!
+!
+!	!	프레임 삭제
+!	!----------------------------------------------------------------------------------------------------	
+!	if	GLOB_MODPAR_NAME = "bFrame_hide_vert" | GLOB_MODPAR_NAME = "bFrame_hide_hori" \
+!		| GLOB_MODPAR_NAME = "iCol_num" | GLOB_MODPAR_NAME = "iRow_num" \
+!		| GLOB_MODPAR_NAME = "iCol_combine_num" | GLOB_MODPAR_NAME = "iRow_combine_num" \
+!		| GLOB_MODPAR_NAME = "iFrame_setting" then
+!		bFrame_hide_calc = 1
+!	endif
+!
+!	if	bFrame_hide_calc	then
+!
+!		!	Initialize
+!		!------------------------------------------------------------------------------------------------------
+!		if	GLOB_MODPAR_NAME = "iCol_num" | GLOB_MODPAR_NAME = "iRow_num"	then
+!			for idx = 1	to	iFrame_num_hori
+!				bFrame_hide_hori[idx] = 0
+!			next idx
+!			for idx = 1	to	iFrame_num_vert
+!				bFrame_hide_vert[idx] = 0
+!			next idx			
+!		endif
+!
+!		!	레이아웃 병합에 따른 프레임 숨김
+!		!------------------------------------------------------------------------------------------------------
+!		if	 GLOB_MODPAR_NAME = "iCol_combine_num" | GLOB_MODPAR_NAME = "iRow_combine_num"	then
+!			gosub	"frame_layout_combine"
+!			parameters	bFrame_hide_vert = bFrame_hide_vert
+!			parameters	bFrame_hide_hori = bFrame_hide_hori
+!		endif
+!
+!		!	수직/수평 위치 변경에 따른 길이 연산
+!		!------------------------------------------------------------------------------------------------------
+!		gosub	"frame_vert_len_calc"
+!		parameters	mFrame_len_vert = mFrame_len_vert
+!		parameters	mFrame_len_vert_ext = mFrame_len_vert_ext
+!
+!		gosub	"frame_hori_len_calc"
+!		parameters	mFrame_len_hori = mFrame_len_hori
+!		parameters	mFrame_len_vert_ext = mFrame_len_vert_ext
+!
+!	endif
+!
+!
+!
+!
+!!----------------------------------------------------------------------------------------------------
+!!	잠금 및 숨김
+!!----------------------------------------------------------------------------------------------------
+!	!	사이즈
+!	!------------------------------------------------------------------------------------------------------
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then	
+!		hideparameter	"mFrame_vert_w", "mFrame_vert_d", "mFrame_hori_w", "mFrame_hori_d"
+!		hideparameter	"mFrame_vert_w_in", "mFrame_vert_d_in", "mFrame_hori_w_in", "mFrame_hori_d_in"
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then	
+!		hideparameter	"mFrame_once_w", "mFrame_once_d"
+!		hideparameter	"mFrame_vert_w_in", "mFrame_vert_d_in", "mFrame_hori_w_in", "mFrame_hori_d_in"
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then	
+!		hideparameter	"mFrame_once_w", "mFrame_once_d"
+!	endif
+!
+!
+!	!	2D 표현
+!	!------------------------------------------------------------------------------------------------------
+!	if	bFrame_pen_setting	then
+!		lock	"iFrame_all_pen"
+!		hideparameter	"iFrame_all_pen"
+!	else
+!		lock	"iFrame_cont_pen", "iFrame_sect_pen", "iFrame_pen"
+!		hideparameter 	"iFrame_cont_pen", "iFrame_sect_pen", "iFrame_pen"
+!	endif
+!
+!
+!!======================================================================================================
+!end
+!!======================================================================================================
+!
+!
+!!	레이아웃
+!!----------------------------------------------------------------------------------------------------
+!"frame_size_insert"		:
+!
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		!	수직
+!		for i = 1	to	iFrame_num_vert
+!			mFrame_size_vert[i][W] = mFrame_once_w
+!			mFrame_size_vert[i][D] = mFrame_once_d
+!		next i	
+!		!	수평	
+!		for i = 1	to	iFrame_num_hori
+!			mFrame_size_hori[i][W] = mFrame_once_w
+!			mFrame_size_hori[i][D] = mFrame_once_d	
+!		next i
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		!	수직
+!		for i = 1	to	iFrame_num_vert
+!			mFrame_size_vert[i][W] = mFrame_vert_w
+!			mFrame_size_vert[i][D] = mFrame_vert_d
+!		next i	
+!		!	수평	
+!		for i = 1	to	iFrame_num_hori
+!			mFrame_size_hori[i][W] = mFrame_hori_w
+!			mFrame_size_hori[i][D] = mFrame_hori_d	
+!		next i		
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		!	수직
+!		for i = 1	to	iFrame_num_vert
+!			if	iFrame_inout_vert[i] = FRAME_OUT	then
+!				mFrame_size_vert[i][W] = mFrame_vert_w
+!				mFrame_size_vert[i][D] = mFrame_vert_d
+!			else
+!				if	iFrame_inout_vert[i] = FRAME_IN	then
+!					mFrame_size_vert[i][W] = mFrame_vert_w_in
+!					mFrame_size_vert[i][D] = mFrame_vert_d_in
+!				endif	
+!			endif			
+!		next i	
+!		!	수평
+!		for i = 1	to	iFrame_num_hori
+!			if	iFrame_inout_hori[i] = FRAME_OUT	then
+!				mFrame_size_hori[i][W] = mFrame_hori_w
+!				mFrame_size_hori[i][D] = mFrame_hori_d	
+!			else
+!				if	iFrame_inout_hori[i] = FRAME_IN	then
+!					mFrame_size_hori[i][W] = mFrame_hori_w_in
+!					mFrame_size_hori[i][D] = mFrame_hori_d_in	
+!				endif
+!			endif
+!		next i		
+!	endif		
+!
+!return
+!
+!
+!"frame_layout_combine"	:
+!	!	레이아웃 병합에 따른 프레임 숨김
+!	
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		mFrmW_vert = mFrame_once_w
+!		mFrmW_vert_in = mFrame_once_w
+!		mFrmW_hori = mFrame_once_w
+!		mFrmW_hori_in = mFrame_once_w		
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_vert_in = mFrame_vert_w
+!		mFrmW_hori = mFrame_hori_w
+!		mFrmW_hori_in = mFrame_hori_w			
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_vert_in = mFrame_vert_w_in
+!		mFrmW_hori = mFrame_hori_w
+!		mFrmW_hori_in = mFrame_hori_w_in	
+!	endif
+!
+!	!	수직
+!	!----------------------------------------------------------------------------------------------------
+!	if	iCol_combine_num > EPS	then
+!		for idx = 1	to	iFrame_num_hori
+!			if	idx <= iRow_num	then
+!				mFrmW_sub = mFrmW_vert
+!			else
+!				mFrmW_sub = mFrmW_vert_in
+!			endif
+!			!	외곽 프레임은 제외
+!			if	not(idx % iRow_num = 1 | idx % iRow_num = 0)	then
+!				if	abs(mFrame_pos_hori[idx][POSX]-(mFrmW_sub/2) - mCol_pos[iCol_combine_num]) < EPS	then
+!					bFrame_hide_hori[idx] = 1
+!				else
+!					bFrame_hide_hori[idx] = 0
+!				endif
+!			else
+!				bFrame_hide_hori[idx] = 0
+!			endif
+!		next idx
+!	else
+!		for idx = 1	to	iFrame_num_hori
+!			bFrame_hide_hori[idx] = 0
+!		next idx
+!	endif
+!
+!	!	수평
+!	!----------------------------------------------------------------------------------------------------
+!	if	iRow_combine_num > EPS	then
+!		for idx = 1+(iRow_num-1)	to	iFrame_num_vert-(iRow_num-1)
+!			if	mFrame_pos_vert[idx][POSZ] < EPS	then
+!				mFrmW_sub = mFrmW_hori
+!			else
+!				mFrmW_sub = mFrmW_hori_in
+!			endif
+!			if	not(mFrame_pos_vert[idx][POSZ] < EPS)	then
+!				if	abs(mFrame_pos_vert[idx][POSZ] - mRow_pos[iRow_combine_num]) < EPS	then
+!					bFrame_hide_vert[idx] = 1
+!				else
+!					bFrame_hide_vert[idx] = 0
+!				endif
+!			else
+!				if	abs(mFrame_pos_vert[idx][POSZ]+(mFrmW_sub/2) - mRow_pos[iRow_combine_num]) < EPS	then
+!					bFrame_hide_vert[idx] = 1
+!				else
+!					bFrame_hide_vert[idx] = 0
+!				endif
+!			endif
+!		next idx
+!	else
+!		for idx = 1	to	iFrame_num_vert
+!			bFrame_hide_vert[idx] = 0
+!		next idx
+!	endif
+!
+!return
+!
+!
+!"frame_inout_calc"	:
+!!	내외부 프레임을 인덱스별로 체크 
+!
+!	!	수직
+!	for i = 1	to	iFrame_num_vert
+!		if	i <= (iRow_num-1) | (i > iFrame_num_vert-(iRow_num-1) & i <= iFrame_num_vert)	then
+!			iFrame_inout_vert[i] = FRAME_OUT
+!		else
+!			iFrame_inout_vert[i] = FRAME_IN
+!		endif				
+!	next i	
+!	!	수평
+!	for i = 1	to	iFrame_num_hori
+!		if	i % iRow_num = 1 | i % iRow_num = 0	then
+!			iFrame_inout_hori[i] = FRAME_OUT
+!		else
+!			iFrame_inout_hori[i] = FRAME_IN	
+!		endif
+!	next i	
+!
+!return
+!
+!
+!
+!!	위치
+!!----------------------------------------------------------------------------------------------------
+!"frame_vert_pos_calc"	:
+!
+!	!	자투리 부분 이동
+!	!----------------------------------------------------------------------------------------------------
+!	!	앞단
+!	for i = 2	to	iFrame_num_vert
+!		idx = i
+!		idx_pre = idx-1
+!		if	bFrame_hide_vert[idx_pre] & abs(mFrame_pos_vert[idx][POSX]-mFrame_pos_vert[idx_pre][POSX]) < EPS	then
+!			mFrame_pos_vert[idx][POSZ] = mFrame_pos_vert[idx][POSZ] - mFrmW/2
+!		endif
+!	next i
+!
+!return
+!
+!"frame_vert_n_pos_calc"	:
+!
+!	!	N등분 위치 계산
+!	!----------------------------------------------------------------------------------------------------
+!	idx = 1
+!	for r = 1	to	iCol_num
+!		for i = 1	to	iRow_num-1
+!
+!			!	X축 
+!			!----------------------------------------------------------------------------------------------------
+!			if	r = 1	then
+!				mFrame_pos_vert[idx][POSX] = mFrame_size_vert[idx][W]/2
+!			else
+!				if	r = iCol_num	then
+!					mFrame_pos_vert[idx][POSX] = mWidth - mFrame_size_vert[idx][W]/2
+!				else
+!					mFrame_pos_vert[idx][POSX] = mFrame_size_vert[1][W]/2 + mFrame_space_w*(r-1)
+!				endif
+!			endif
+!
+!			!	Z축
+!			!----------------------------------------------------------------------------------------------------
+!			if	i = 1	then
+!				mFrame_pos_vert[idx][POSZ] = 0
+!			else
+!				mFrame_pos_vert[idx][POSZ] = mFrame_size_hori[1][W]/2 + mFrame_space_d*(i-1)
+!			endif
+!
+!			idx = idx + 1
+!		next i
+!	next r
+!
+!return
+!
+!"frame_hori_n_pos_calc"	:
+!	
+!	!	N등분 위치 계산
+!	!----------------------------------------------------------------------------------------------------
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		mFrmW = mFrame_once_w
+!		mFrmW_in = mFrame_once_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW = mFrame_vert_w
+!		mFrmW_in = mFrame_vert_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		mFrmW = mFrame_vert_w
+!		mFrmW_in = mFrame_vert_w_in
+!	endif
+!
+!	idx = 1
+!	for r = 1	to	iCol_num-1
+!		for i = 1	to	iRow_num
+!
+!			!	X축 !!!!!!!!!! 수정중 !!!!!!!!!!!!!!!
+!			!----------------------------------------------------------------------------------------------------
+!			if	r = 1	then
+!				mFrame_pos_hori[idx][POSX] = mFrmW + mFrame_space_w*(r-1)
+!			else
+!				mFrame_pos_hori[idx][POSX] = mFrmW/2 + mFrmW_in/2 + mFrame_space_w*(r-1)
+!			endif		
+!
+!			!	Z축
+!			!----------------------------------------------------------------------------------------------------
+!			if	i = 1	then
+!				mFrame_pos_hori[idx][POSZ] = mFrame_size_hori[i][W]/2
+!			else
+!				if	i = iRow_num	then
+!					mFrame_pos_hori[idx][POSZ] = mHeight - mFrame_size_hori[i][W]/2
+!				else
+!					mFrame_pos_hori[idx][POSZ] = mFrame_size_hori[1][W]/2 + mFrame_space_d*(i-1)
+!				endif
+!			endif
+!			idx = idx + 1
+!		next i
+!	next r
+!
+!return
+!
+!"frame_pos_calc"	:
+!
+!	idx = 1
+!	for r = 1	to	iCol_num
+!		for i = 1	to	iRow_num-1
+!			mCol_pos[r] = mFrame_pos_vert[idx][POSX]
+!			idx = idx + 1
+!		next i
+!	next r
+!
+!	idx = 1
+!	for r = 1	to	iCol_num-1
+!		for i = 1	to	iRow_num
+!			mRow_pos[i] = mFrame_pos_hori[idx][POSZ]
+!			idx = idx + 1
+!		next i
+!	next r
+!
+!return
+!
+!"frame_size_to_pos_calc"	:
+!	! 사이즈 변경에 따른 프레임 위치 변경
+!
+!	!	수직 프레임
+!	!------------------------------------------------------------------------------------------------------
+!	!	첫번째 Column
+!	for idx = 1	to	iRow_num-1
+!		mFrame_pos_vert[idx][POSX] = mFrame_size_vert[idx][POSX]/2
+!	next idx
+!	!	마지막 Column
+!	for idx = iFrame_num_vert-(iRow_num-1)+1	to	iFrame_num_vert
+!		mFrame_pos_vert[idx][POSX] = mWidth - mFrame_size_vert[idx][POSX]/2
+!	next idx
+!
+!	!	수평 프레임
+!	!------------------------------------------------------------------------------------------------------				
+!	for idx = 1	to	iFrame_num_hori
+!
+!		!	X축
+!		!------------------------------------------------------------------------------------------------------		
+!		if	idx = 1	then
+!			idx_vert = 1
+!		else
+!			if	idx % iRow_num < EPS	then
+!				idx_vert = idx_vert
+!			else
+!				idx_vert = idx_vert+1
+!			endif					
+!		endif
+!		if	iFrame_inout_vert[idx_vert] = FRAME_OUT	then
+!			mFrame_pos_hori[idx][POSX] = mFrame_pos_vert[idx_vert][POSX] + mFrmW_vert_now/2
+!		else
+!			if	iFrame_inout_vert[idx_vert] = FRAME_IN	then
+!				mFrame_pos_hori[idx][POSX] = mFrame_pos_vert[idx_vert][POSX] + mFrmW_vert_in_now/2
+!			endif
+!		endif
+!		
+!
+!		!	Z축
+!		!------------------------------------------------------------------------------------------------------								
+!		if	idx = 1	then
+!			idx_hori = 1
+!		else
+!			if	idx_hori < iRow_num	then
+!				idx_hori = idx_hori+1
+!			else
+!				idx_hori = 1
+!			endif					
+!		endif
+!
+!		!	첫번째 Row
+!		if	idx_hori = 1	then
+!			mFrame_pos_hori[idx][POSZ] = mFrame_size_hori[idx][POSX]/2
+!		else
+!			!	마지막 Row
+!			if	idx_hori = iRow_num	then
+!				mFrame_pos_hori[idx][POSZ] = mHeight - mFrame_size_hori[idx][POSX]/2
+!			endif
+!		endif	
+!
+!	next idx
+!
+!return
+!
+!
+!
+!!	길이
+!!----------------------------------------------------------------------------------------------------
+!"frame_dist_calc"	:
+!
+!	for i = 1	to	iCol_num
+!		mCol_dist[i] = 0
+!		if	i = 1	then
+!			mCol_dist[i] = mCol_pos[i]
+!		else
+!			mCol_dist[i] = mCol_pos[i] - mCol_pos[i-1]
+!		endif
+!	next i
+!	for i = 1	to	iRow_num
+!		mRow_dist[i] = 0
+!		if	i = 1	then
+!			mRow_dist[i] = mCol_pos[i]
+!		else
+!			mRow_dist[i] = mRow_pos[i] - mRow_pos[i-1]
+!		endif
+!	next i
+!
+!return
+!
+!
+!"frame_vert_len_calc"	:
+!
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		! mFrmW = mFrame_once_w
+!		mFrmW_hori = mFrame_once_w
+!		mFrmW_hori_in = mFrame_once_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		! mFrmW = mFrame_vert_w
+!		mFrmW_hori = mFrame_hori_w
+!		mFrmW_hori_in = mFrame_hori_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		! mFrmW = mFrame_vert_w
+!		mFrmW_hori = mFrame_hori_w
+!		mFrmW_hori_in = mFrame_hori_w_in
+!	endif
+!
+!	!	길이 입력
+!	!----------------------------------------------------------------------------------------------------
+!	for idx = 1	to	iFrame_num_vert
+!		if	idx = 1	then
+!			idx_row = 1
+!		else
+!			if	idx_row < iRow_num-1	then
+!				idx_row = idx_row + 1
+!			else
+!				idx_row = 1
+!			endif
+!		endif
+!
+!		if	idx_row < iRow_num-1	then
+!			idx_next = idx+1
+!			tempL = mFrame_pos_vert[idx_next][POSZ] - mFrame_pos_vert[idx][POSZ]
+!		else
+!			tempL = mHeight - mFrame_pos_vert[idx][POSZ]
+!		endif
+!		mFrame_len_vert[idx] = tempL 
+!	next idx
+!
+!
+!	!	(붙은 프레임이 숨겨질 경우) 수직 프레임 자투리 부분 길이 연장
+!	!----------------------------------------------------------------------------------------------------
+!	for i = 1	to	iFrame_num_vert
+!
+!		idx = i
+!		for n = idx+1	to	iFrame_num_vert
+!			if	not(bFrame_hide_vert[n])	then
+!				idx_next = n
+!				n = iFrame_num_vert
+!			endif
+!		next n
+!
+!		if	mFrame_pos_vert[i][POSZ] < EPS	then
+!			!	최하단 프레임
+!			if	bFrame_hide_vert[idx+1]	then
+!				mFrame_len_vert_ext[idx][POS_FRONT] = 0
+!				mFrame_len_vert_ext[idx][POS_END] = mFrmW_hori_in/2
+!			else
+!				mFrame_len_vert_ext[idx][POS_FRONT] = 0
+!				mFrame_len_vert_ext[idx][POS_END] = 0	
+!			endif	
+!		else
+!			if	mFrame_pos_vert[i+1][POSZ] < EPS	then
+!				!	최상단 프레임
+!				if	bFrame_hide_vert[idx-1]	then
+!					mFrame_len_vert_ext[idx][POS_FRONT] = mFrmW_hori_in/2
+!					mFrame_len_vert_ext[idx][POS_END] = 0
+!				else
+!					mFrame_len_vert_ext[idx][POS_FRONT] = 0
+!					mFrame_len_vert_ext[idx][POS_END] = 0	
+!				endif
+!			else	
+!				!	중단 프레임
+!				if	bFrame_hide_vert[idx-1]	then
+!					mFrame_len_vert_ext[idx][POS_FRONT] = mFrmW_hori_in/2
+!				else
+!					mFrame_len_vert_ext[idx][POS_FRONT] = 0
+!				endif
+!				if	bFrame_hide_vert[idx+1]	then
+!					mFrame_len_vert_ext[idx][POS_END] = mFrmW_hori_in/2
+!				else
+!					mFrame_len_vert_ext[idx][POS_END] = 0
+!				endif									
+!			endif
+!		endif		
+!
+!	next i
+!
+!
+!	!	연결되어있는 프레임은 하나로 결합하여 표현
+!	!----------------------------------------------------------------------------------------------------
+!	for i = 1	to	iFrame_num_vert
+!		idx = i
+!		idx_next = idx+1
+!		n = 1
+!		if	not(bFrame_hide_vert[idx])	then
+!			while (not(bFrame_hide_vert[idx_next])) & (abs(mFrame_pos_vert[idx][POSX]-mFrame_pos_vert[idx_next][POSX]) < EPS) & (idx_next <= iFrame_num_vert) & (n <= iWhileN) do
+!				mFrame_len_vert[idx] = mFrame_len_vert[idx] + mFrame_len_vert[idx_next]	+ mFrame_len_vert_ext[idx_next][POS_END]
+!				mFrame_len_vert[idx_next] = 0
+!				idx_next = idx_next+1
+!				n = n+1
+!				if	n = iWhileN	then	
+!					parameters	stError = stMyname + "수직프레임 길이 계산 반복문 횟수 초과"
+!				else
+!					parameters	stError = "오류 없음"
+!				endif
+!			endwhile
+!		endif
+!	next i
+!
+!return
+!
+!
+!"frame_hori_len_calc"	:
+!
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		mFrmW = mFrame_once_w
+!		mFrmW_in = mFrame_once_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW = mFrame_vert_w
+!		mFrmW_in = mFrame_vert_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		mFrmW = mFrame_vert_w
+!		mFrmW_in = mFrame_vert_w_in
+!	endif
+!
+!	!	길이 입력
+!	!----------------------------------------------------------------------------------------------------
+!	for i = 1	to	iFrame_num_hori
+!		idx = i
+!		idx_next = idx+iRow_num
+!		if	idx_next <= iFrame_num_hori	then
+!			tempL = mFrame_pos_hori[idx_next][POSX] - mFrame_pos_hori[idx][POSX] - mFrmW_in
+!		else
+!			tempL = mWidth - mFrame_pos_hori[idx][POSX] - mFrmW
+!		endif	
+!		mFrame_len_hori[idx] = tempL
+!	next i
+!
+!
+!	!	수직프레임이 삭제 되었을 경우 
+!	!----------------------------------------------------------------------------------------------------
+!	!	1. 검토대상인 수평프레임 선택 : 검토 순서는 마지막 인덱스로 부터 시작(그래야 누적해서 계산가능함)
+!	for i = 1	to	iFrame_num_hori
+!		idx = iFrame_num_hori+1 - i													!	수평 프레임 인덱스 
+!
+!		!	2. 끝단 위치에 있는 수직프레임 탐색
+!		mFrame_pos_hori_end = mFrame_pos_hori[idx][POSX]+mFrame_len_hori[idx]
+!		
+!		if	idx < iRow_num	then
+!			mFrame_pos_vert_find_X = mFrame_pos_hori_end+mFrmW/2						!	수직 프레임 찾는 X축 위치
+!		else
+!			mFrame_pos_vert_find_X = mFrame_pos_hori_end+mFrmW_in/2						!	수직 프레임 찾는 X축 위치
+!		endif		
+!		mFrame_pos_vert_find_Z = mFrame_pos_hori[idx][POSZ]							!	수직 프레임 찾는 Z축 위치
+!
+!		iFrame_vert_idx_front = 0													!	수직프레임 앞단 인덱스
+!		iFrame_vert_idx_end = 0														!	수직프레임 뒷단 인덱스
+!
+!		for r = 1	to	iFrame_num_vert
+!			if	iFrame_inout_vert[r] = FRAME_OUT	then
+!				mFrmW_sub = mFrame_vert_w
+!			else
+!				if	iFrame_inout_vert[r] = FRAME_IN	then
+!					mFrmW_sub = mFrame_vert_w_in
+!				endif
+!			endif
+!			!	2-1. 수직프레임 앞단 탐색
+!			if	iFrame_vert_idx_front = 0	then								
+!				if	abs(mFrame_pos_vert[r][POSX]-mFrame_pos_vert_find_X) < mFrmW_sub/2+EPS  	then
+!					if	abs(mFrame_pos_vert[r][POSZ]-mFrame_pos_vert_find_Z) < mFrame_size_hori[idx][W]/2+EPS 	then
+!						if	bFrame_hide_vert[r]	then
+!							iFrame_vert_idx_front = r
+!						endif
+!					endif
+!				endif
+!			endif
+!
+!			!	2-2. 수직프레임 끝단 탐색 
+!			if	iFrame_vert_idx_end = 0	then
+!				if	abs(mFrame_pos_vert[r][POSX]-mFrame_pos_vert_find_X) < mFrmW_sub/2+EPS  	then
+!					if	abs(mFrame_pos_vert[r][POSZ]+mFrame_len_vert[r]-mFrame_pos_vert_find_Z) < mFrame_size_hori[idx][W]/2+EPS 	then
+!						if	bFrame_hide_vert[r]	then
+!							iFrame_vert_idx_end = r
+!						endif
+!					endif
+!				endif	
+!			endif
+!		next r
+!
+!		!	3. 수평프레임 길이 조정
+!		!		현재 프레임 길이 = 프레임길이 + 수직프레임 너비 + 다음 프레임 길이
+!		!		다음 프레임 길이 = 0
+!		!	3-1. 최하단/최상단 위치 판단
+!		bFrame_hori_top = 0								!	최상단일 경우 활성화
+!		bFrame_hori_bottom = 0							!	최하단일 경우 활성화 
+!		if	mFrame_pos_hori[idx][POSZ]-mFrame_size_hori[idx][W]/2 < EPS	then
+!			bFrame_hori_bottom = 1
+!		endif
+!		if	mFrame_pos_hori[idx][POSZ]+mFrame_size_hori[idx][W]/2 > mHeight-EPS	then
+!			bFrame_hori_top = 1
+!		endif
+!
+!		!	3-2. 최하단일 경우
+!		if	bFrame_hori_bottom	then
+!			if	iFrame_vert_idx_front > EPS	then
+!				idx_sub = idx
+!				gosub	"frame_hori_nowNext_len_calc"
+!			endif
+!		else
+!			!	3-3. 최상단일 경우
+!			if	bFrame_hori_top	then
+!				if	iFrame_vert_idx_end > EPS	then
+!					idx_sub = idx
+!					gosub	"frame_hori_nowNext_len_calc"
+!				endif
+!			else
+!				!	3-4. 중단일 경우 
+!				if	iFrame_vert_idx_front > EPS & iFrame_vert_idx_end > EPS	then
+!					idx_sub = idx
+!					gosub	"frame_hori_nowNext_len_calc"
+!				endif	
+!			endif
+!		endif
+!
+!	next i
+!
+!return
+!
+!
+!"frame_vert_n_len_calc"	:
+!
+!	!	N등분 길이 입력
+!	!----------------------------------------------------------------------------------------------------
+!	for i = 1	to	iFrame_num_vert
+!		idx = i
+!		idx_next = idx+1
+!		tempL = mFrame_pos_vert[idx_next][POSZ] - mFrame_pos_vert[idx][POSZ]
+!		if	tempL < EPS | idx = iFrame_num_vert | iRow_num = 2 	then
+!			tempL = mHeight - mFrame_pos_vert[idx][POSZ]
+!		endif
+!		mFrame_len_vert[i] = tempL
+!	next i
+!
+!return
+!
+!
+!
+!"frame_hori_nowNext_len_calc"	:
+!
+!	for isub = idx_sub+1	to	iFrame_num_hori
+!		if	abs(mFrame_pos_hori[idx_sub][POSZ]-mFrame_pos_hori[isub][POSZ]) < EPS	then
+!			idx_next = isub
+!			isub = iFrame_num_hori
+!		endif
+!	next isub	 
+!
+!	!	프레임 길이 조정
+!	if	idx_sub <= iFrame_num_hori-iRow_num	then
+!		mFrame_len_hori[idx] = mFrame_len_hori[idx] + mFrmW_in + mFrame_len_hori[idx_next]
+!		mFrame_len_hori[idx_next] = 0
+!	endif
+!
+!return
+!
+!
+!"frame_dist_re_calc"	:
+!
+!	!	X축
+!	!----------------------------------------------------------------------------------------------------
+!	if	GLOB_MODPAR_NAME = "mCol_dist"	then
+!		idx = 0
+!		for i = 2	to	iCol_num-1
+!			if	abs(mCol_dist[i]-mCol_dist_temp[i]) > EPS	then
+!				idx = i
+!			endif
+!		next i
+!		if	idx <> 0	then
+!			mCol_dist[idx+1] = mCol_dist[idx+1] - (mCol_dist[idx]-mCol_dist_temp[idx])
+!			mCol_pos[idx] = mCol_pos[idx] + (mCol_dist[idx]-mCol_dist_temp[idx])
+!		endif
+!	endif
+!
+!	!	Z축
+!	!----------------------------------------------------------------------------------------------------
+!	if	GLOB_MODPAR_NAME = "mRow_dist"	then
+!		idx = 0
+!		for i = 2	to	iRow_num-1
+!			if	abs(mRow_dist[i]-mRow_dist_temp[i]) > EPS	then
+!				idx = i
+!			endif
+!		next i		
+!		if	idx <> 0	then
+!			mRow_dist[idx+1] = mRow_dist[idx+1] + (mRow_dist_temp[idx]-mRow_dist[idx])
+!			mRow_pos[idx] = mRow_pos[idx] + (mRow_dist[idx]-mRow_dist_temp[idx])
+!		endif
+!	endif
+!
+!return
+!
+!
+!
+!!	핫스팟
+!!----------------------------------------------------------------------------------------------------
+!"frame_hostpot_value_calc"	:
+!
+!	
+!	!	 X축
+!	!----------------------------------------------------------------------------------------------------	
+!	idx = 0
+!	for i = 2	to	iCol_num-1
+!		if	abs(mCol_dist[i]-mCol_dist_temp[i]) > EPS	then
+!			idx = i
+!			i = iCol_num
+!		endif
+!	next i
+!	if	idx > 0	then
+!		if	i = 1	then
+!			mCol_pos[idx] = mCol_dist[idx]
+!		else
+!			mCol_pos[idx] = mCol_pos[idx-1] + mCol_dist[idx]
+!		endif	
+!	endif
+!
+!	!	 Z축
+!	!----------------------------------------------------------------------------------------------------	
+!	idx = 0
+!	for i = 2	to	iRow_num-1
+!		if	abs(mRow_dist[i]-mRow_dist_temp[i]) > EPS	then
+!			idx = i
+!			i = iRow_num
+!		endif
+!	next i	
+!	if	idx > 0	then
+!		if	i = 1	then
+!			mRow_pos[idx] = mRow_dist[idx]
+!		else
+!			mRow_pos[idx] = mRow_pos[idx-1] + mRow_dist[idx]
+!		endif	
+!	endif
+!
+!return
+!
+!
+!"frame_hostpot_range_calc"	:
+!
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		mFrmW_vert = mFrame_once_w
+!		mFrmW_vert_in = mFrame_once_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_vert_in = mFrame_vert_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_vert_in = mFrame_vert_w_in
+!	endif
+!
+!	!	범위 지정
+!	!----------------------------------------------------------------------------------------------------
+!	!	1. 변경된 인덱스 찾기
+!	!	2. 범위에 미만/초과되는 값들은 최소값 재입력
+!
+!		!	X축
+!		!----------------------------------------------------------------------------------------------------
+!		idx = 0
+!		for i = 2	to	iCol_num-1
+!			if	abs(mCol_pos[i]-mCol_pos_temp[i]) > EPS	then
+!				idx = i
+!			endif
+!		next i
+!		if	idx <> 0	then
+!			if	(mCol_pos[idx] + mFrmW_vert/2) > (mCol_pos[idx+1] - mFrmW_vert/2)	then
+!				mCol_pos[idx] = mCol_pos[idx+1] - mFrmW_vert - mFrame_dist_min
+!				parameters	mCol_pos[idx] = mCol_pos[idx]
+!			endif
+!			if	(mCol_pos[idx] - mFrmW_vert/2) < (mCol_pos[idx-1] + mFrmW_vert/2)	then
+!				mCol_pos[idx] = mCol_pos[idx-1] + mFrmW_vert + mFrame_dist_min
+!				parameters	mCol_pos[idx] = mCol_pos[idx]
+!			endif
+!		endif
+!
+!
+!		!	Z축
+!		!----------------------------------------------------------------------------------------------------
+!		idx = 0
+!		for i = 2	to	iRow_num-1
+!			if	abs(mRow_pos[i]-mRow_pos_temp[i]) > EPS	then
+!				idx = i
+!			endif
+!		next i		
+!		if	idx <> 0	then
+!			if	(mRow_pos[idx] + mFrame_hori_w/2) > (mRow_pos[idx+1] - mFrame_hori_w/2)	then
+!				mRow_pos[idx] = mRow_pos[idx+1] - mFrame_hori_w - mFrame_dist_min
+!				parameters	mRow_pos[idx] = mRow_pos[idx]
+!			endif
+!			if	(mRow_pos[idx] - mFrame_hori_w/2) < (mRow_pos[idx-1] + mFrame_hori_w/2)	then
+!				mRow_pos[idx] = mRow_pos[idx-1] + mFrame_hori_w + mFrame_dist_min
+!				parameters	mRow_pos[idx] = mRow_pos[idx]
+!			endif
+!		endif
+!
+!return
+!
+!
+!"frame_hotspot_pos_calc"	:
+!
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		mFrmW_vert = mFrame_once_w
+!		mFrmW_hori = mFrame_once_w
+!		mFrmW_vert_in = mFrame_once_w
+!		mFrmW_hori_in = mFrame_once_w		
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_hori = mFrame_hori_w
+!		mFrmW_vert_in = mFrame_vert_w
+!		mFrmW_hori_in = mFrame_hori_w		
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_INOUT	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_hori = mFrame_hori_w
+!		mFrmW_vert_in = mFrame_vert_w_in
+!		mFrmW_hori_in = mFrame_hori_w_in	
+!	endif
+!
+!	!	X축 위치 변경
+!	!----------------------------------------------------------------------------------------------------	
+!	idx = 1
+!	for r = 1	to	iCol_num
+!		for i = 1	to	iRow_num-1
+!			mFrame_pos_vert[idx][POSX] = mCol_pos[r]
+!			idx = idx + 1
+!		next i
+!	next r
+!	idx = 1
+!	for r = 1	to	iCol_num-1
+!		for i = 1	to	iRow_num
+!			if	r = 1	then
+!				mFrame_pos_hori[idx][POSX] = mCol_pos[r] + mFrmW_vert/2
+!			else
+!				mFrame_pos_hori[idx][POSX] = mCol_pos[r] + mFrmW_vert_in/2
+!			endif			
+!			idx = idx + 1
+!		next i
+!	next r
+!
+!	!	Z축 위치 변경
+!	!----------------------------------------------------------------------------------------------------	
+!	idx = 1
+!	for r = 1	to	iCol_num
+!		for i = 1	to	iRow_num-1
+!			if	i = 1	then
+!				mFrame_pos_vert[idx][POSZ] = mRow_pos[i] - mFrmW_hori/2
+!			else
+!				mFrame_pos_vert[idx][POSZ] = mRow_pos[i]
+!			endif
+!			idx = idx + 1
+!		next i
+!	next r
+!	idx = 1
+!	for r = 1	to	iCol_num-1
+!		for i = 1	to	iRow_num
+!			mFrame_pos_hori[idx][POSZ] = mRow_pos[i]
+!			idx = idx + 1
+!		next i
+!	next r
+!
+!return
+!
+!
+!"frame_hostpot_range_calc_new"	:
+!
+!	if	iFrame_setting = FRAME_SIZE_ONCE	then
+!		mFrmW_vert = mFrame_once_w
+!		mFrmW_hori = mFrame_once_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_hori = mFrame_hori_w
+!	endif
+!	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+!		mFrmW_vert = mFrame_vert_w
+!		mFrmW_vert_in = mFrame_vert_w_in
+!	endif
+!
+!	!	범위 지정
+!	!----------------------------------------------------------------------------------------------------
+!	!	1. 변경된 인덱스 찾기
+!	!	2. 범위에 미만/초과되는 값들은 최소값 재입력
+!
+!		!	X축
+!		!----------------------------------------------------------------------------------------------------
+!		if	GLOB_MODPAR_NAME = "mCol_dist"	then
+!			idx = 0
+!			for n = 2	to	iCol_num-1
+!				if	abs(mCol_dist[n]-mCol_dist_temp[n]) > EPS	then
+!					idx = n
+!					n = iCol_num-1
+!				endif
+!			next n
+!			
+!			if	idx <> 0	then
+!				if	(mCol_pos[idx+1] - mFrmW_vert/2)-(mCol_pos[idx] + mFrmW_vert/2) <= mFrame_dist_min	then
+!					mCol_pos[idx] = mCol_pos[idx+1] - mFrmW_vert - mFrame_dist_min
+!					mCol_dist[idx] = mCol_pos[idx+1] - mCol_pos[idx]
+!					mCol_dist[idx-1] = mCol_pos[idx] - mCol_pos[idx-1]
+!				endif
+!				if	(mCol_pos[idx] - mFrmW_vert/2)-(mCol_pos[idx-1] + mFrmW_vert/2) <= mFrame_dist_min 	then
+!					mCol_pos[idx] = mCol_pos[idx-1] + mFrmW_vert + mFrame_dist_min
+!					mCol_dist[idx] = mCol_pos[idx+1] - mCol_pos[idx]
+!					mCol_dist[idx-1] = mCol_pos[idx] - mCol_pos[idx-1]				
+!				endif
+!			endif
+!		endif
+!
+!
+!		!	Z축
+!		!----------------------------------------------------------------------------------------------------
+!		if	GLOB_MODPAR_NAME = "mRow_dist"	then
+!			idx = 0
+!			for i = 2	to	iRow_num-1
+!				if	abs(mRow_dist[i]-mRow_dist_temp[i]) > EPS	then
+!					idx = i
+!					i = iRow_num-1
+!				endif
+!			next i
+!			
+!			if	idx <> 0	then
+!				if	(mRow_pos[idx+1] - mFrame_hori_w/2)-(mRow_pos[idx] + mFrame_hori_w/2) <= mFrame_dist_min	then
+!					mRow_pos[idx] = mRow_pos[idx+1] - mFrame_hori_w - mFrame_dist_min
+!					mRow_dist[idx] = mRow_pos[idx+1] - mRow_pos[idx]
+!					mRow_dist[idx-1] = mRow_pos[idx] - mRow_pos[idx-1]				
+!				endif
+!				if	(mRow_pos[idx] - mFrame_hori_w/2)-(mRow_pos[idx-1] + mFrame_hori_w/2) <= mFrame_dist_min	then
+!					mRow_pos[idx] = mRow_pos[idx-1] + mFrame_hori_w + mFrame_dist_min
+!					mRow_dist[idx] = mRow_pos[idx+1] - mRow_pos[idx]
+!					mRow_dist[idx-1] = mRow_pos[idx] - mRow_pos[idx-1]						
+!				endif
+!			endif
+!		endif
+!
+!return
+!
+!

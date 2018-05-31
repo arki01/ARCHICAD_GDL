@@ -1,0 +1,96 @@
+
+!======================================================================================================
+!	시스템창호 KOR 20
+!======================================================================================================
+!   DATE : 2017/10/19 THU
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+if	bTest	then
+	
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.01
+	hotspot	0, 0, 0
+endif
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	창호
+!----------------------------------------------------------------------------------------------------
+
+rotx	-90
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	addy	mOffset
+		!	 Flip시에 프레임이 이동하지 않도록 
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			addy	-mDepth
+		endif
+		addx	-mWidth/2
+			call	"macro_프레임(시스템) 20.gsm"	parameters	all
+		del	1
+		if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+			del	1
+		endif
+	del	1
+
+	!	패널
+	!----------------------------------------------------------------------------------------------------
+	addy	mOffset
+		if	iSash_num >= 1	then
+			if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+				addy	-mDepth
+			endif
+			if	iFrame_setting = FRAME_SIZE_ONCE	then
+				_mFrm_offsetz = mFrame_once_w				
+			endif
+			if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+				_mFrm_offsetz = mFrame_hori_w
+			endif
+			if	iFrame_setting = FRAME_SIZE_INOUT 	then
+				_mFrm_offsetz = mFrame_hori_w
+			endif
+			_mFrm_offsetz = 0
+
+			add		-mWidth/2, mSash_offset, _mFrm_offsetz
+				for i = 1	to	iSash_num
+					if	mSash_size[i][W] > EPS & mSash_size[i][H] > EPS	then
+						add	mSash_pos[i][POSX], 0, mSash_pos[i][POSZ]
+							call		"macro_패널 20.gsm"	parameters	all		mSash_width = mSash_size[i][W],
+																				mSash_height = mSash_size[i][H],
+																				mDoor_width = mSash_size[i][W],
+																				mDoor_height = mSash_size[i][H],
+																				mDoor_thick = mDoor_thick,
+																				bOrigin = bSash_origin,
+																				iSash_idx = i,
+																				iPanel_type = iPanel_type_arr[i],
+																				iSash_category = iSash_type_arr[i][SASH_CATEGORY],
+																				iSash_type = iSash_type_arr[i][SASH_TYPE],
+																				iGlass_type = iGlass_type_arr[i],
+																				iDoor_type = iDoor_type_arr[i],
+																				iDoor_leaftype = iDoor_leaftype_arr[i]
+						del	1
+					endif
+				next i
+			del	1
+			if	(WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE-180) < EPS) | (WIDO_REVEAL_SIDE = 0 & abs(SYMB_ROTANGLE) < EPS)then
+				del	1
+			endif
+		endif
+	del	1
+	
+del	1
+
+	!	마감
+	!----------------------------------------------------------------------------------------------------
+	call	"macro_마감 20.gsm"	parameters	all		iDetail_3d = iDetail_total

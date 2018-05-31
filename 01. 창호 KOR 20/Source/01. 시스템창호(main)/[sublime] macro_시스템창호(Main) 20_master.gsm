@@ -1,0 +1,305 @@
+
+
+!======================================================================================================
+!	t
+!======================================================================================================
+!   DATE : 2017/10/19 THU
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+EPS = 0.0001
+
+iSash_num_max = vardim1(iSash_type_arr)								!	샤시 최대 수 
+
+
+!----------------------------------------------------------------------------------------------------
+!	타입 정의
+!----------------------------------------------------------------------------------------------------
+
+	!	전체치수
+	!----------------------------------------------------------------------------------------------------
+	!	'iDim' 인덱스 - 마감 매크로에 포함되어있음
+	DIM1 = 1 
+	DIM2 = 2 
+	DIM3 = 3 
+
+	dim stDim[]
+		stDim[DIM1] = "제작치수"
+		stDim[DIM2] = "모듈호칭치수"
+		stDim[DIM3] = "개구부치수"
+
+
+	!	프레임
+	!----------------------------------------------------------------------------------------------------
+	!	iFrame_setting 인덱스
+	FRAME_SIZE_ONCE = 1
+	FRAME_SIZE_VERTHORI = 2
+	FRAME_SIZE_INOUT = 3
+
+
+	!	샤시
+	!----------------------------------------------------------------------------------------------------
+	!	mSash_size 배열 인덱스
+	W = 1
+	H = 2
+
+	!	mSash_pos 배열 인덱스
+	POSX = 1
+	POSZ = 2
+
+	!	mFrame_size_vert 배열 인덱스
+	W = 1
+	D = 2
+
+	!	iSash_type_arr 배열 인덱스
+	SASH_CATEGORY = 1
+	SASH_TYPE = 2
+
+	!	iSash_category 인덱스
+	CATEGORY_SINGLE = 1
+	CATEGORY_DOUBLE = 2
+
+	!	iSash_type 인덱스
+	TYPE_FIXED = 1
+	TYPE_PROJECT_LEFT = 2
+	TYPE_PROJECT_RIGHT = 3
+	TYPE_PROJECT_TOP = 4
+	TYPE_PROJECT_BOTTOM = 5
+	TYPE_DOUBLE_PROJECT = 6
+	TYPE_SLIDING = 7
+
+
+	!	2D / 3D 표현
+	!----------------------------------------------------------------------------------------------------
+	!	'iDetail_2d' 인덱스
+	DETAIL_2D_SIMPLE = 1					
+	DETAIL_2D_DETAIL = 2					
+	DETAIL_2D_OFF = 3	
+	DETAIL_2D_MVO = 4
+
+	dim	stDetail_2d[]
+		stDetail_2d[DETAIL_2D_SIMPLE] = "단순(기본 설계)"		
+		stDetail_2d[DETAIL_2D_DETAIL] = "상세(실시 설계)"		
+		stDetail_2d[DETAIL_2D_OFF] = "끔"			
+		stDetail_2d[DETAIL_2D_MVO] = "by MVO"	
+
+	!	'iDetail_3d' 인덱스
+	DETAIL_3D_SIMPLE = 1					
+	DETAIL_3D_DETAIL = 2					
+	DETAIL_3D_OFF = 3	
+	DETAIL_3D_MVO = 4
+
+	dim	stDetail_3d[]
+		stDetail_3d[DETAIL_2D_SIMPLE] = "단순"		
+		stDetail_3d[DETAIL_2D_DETAIL] = "상세"		
+		stDetail_3d[DETAIL_2D_OFF] = "끔"			
+		stDetail_3d[DETAIL_2D_MVO] = "by MVO"		
+
+
+	!	'iLine_show_2d' , 'iLine_show_3d' 인덱스
+	LINE_SHOW = 1
+	LINE_HIDE = 2
+	LINE_MVO = 3
+
+	dim	stLine_show[]
+		stLine_show[LINE_SHOW] = "보이기"
+		stLine_show[LINE_HIDE] = "숨기기"
+		stLine_show[LINE_MVO] = "by MVO"
+
+
+	!	MVO 
+	!----------------------------------------------------------------------------------------------------
+	! !	'iDetail_setting_mvo' 인덱스
+	! SETTING_ALL = 1
+	! SETTING_SCALE = 2
+
+	! iDetail_setting_mvo = 0
+	! success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iDetail_setting", iDetail_setting_mvo)
+
+	! 	!	일괄 설정 
+	! 	!----------------------------------------------------------------------------------------------------
+	! 	if	iDetail_setting_mvo = SETTING_ALL	then
+	! 		if	iDetail_2d = DETAIL_2D_MVO	then
+	! 			iDetail_2d_temp = 0
+	! 			success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "MVO_iDetail_2d", iDetail_2d_temp)
+	! 			iDetail_2d = iDetail_2d_temp
+	! 		endif
+	! 		! if	iDetail_3d = DETAIL_3D_MVO	then
+	! 		! 	iDetail_3d_temp = 0
+	! 		! 	success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "MVO_iDetail_3d", iDetail_3d_temp)
+	! 		! 	iDetail_3d = iDetail_3d_temp
+	! 		! endif
+	! 	endif
+
+	! 	!	스케일별 설정 
+	! 	!----------------------------------------------------------------------------------------------------
+	! 	if	iDetail_setting_mvo = SETTING_SCALE	then
+	! 		if	iDetail_2d = DETAIL_2D_MVO | iDetail_3d = DETAIL_3D_MVO 	then
+
+	! 			iScale_arr_num = 0
+	! 			success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iDetail_scale_num", iScale_arr_num)
+
+	! 			iScale_arr_temp = 0
+	! 			iDetail_2d_temp = -1
+	! 			iDetail_3d_temp = -1
+	! 			for i = 1	to	iScale_arr_num
+	! 				_stNum = str(i, 1, 0)
+	! 				success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iScale_"+_stNum, iScale_arr_temp)
+	! 				!	현재 스케일과 저장된 스케일 값 비교 
+	! 				if	abs(GLOB_SCALE-iScale_arr_temp) < EPS	then				
+	! 					if	iDetail_2d = DETAIL_2D_MVO	then
+	! 						success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "MVO_iDetail_2d_"+_stNum, iDetail_2d_temp)
+	! 						iDetail_2d = iDetail_2d_temp	
+	! 					endif	
+	! 					! if	iDetail_3d = DETAIL_3D_MVO	then		
+	! 					! 	success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "MVO_iDetail_3d_"+_stNum, iDetail_3d_temp)
+	! 					! 	iDetail_3d = iDetail_3d_temp
+	! 					! endif
+	! 				endif
+	! 			next i
+	! 			if	iDetail_2d_temp = -1 & iDetail_3d_temp = -1	then
+	! 				!	지정된 스케일이 없을 경우 '기타' 스케일 정보를 적용 
+	! 				_stNum = str(iScale_arr_num+1, 1, 0)
+	! 				if	iDetail_2d = DETAIL_2D_MVO	then
+	! 					success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "MVO_iDetail_2d_"+_stNum, iDetail_2d_temp)
+	! 					iDetail_2d = iDetail_2d_temp				
+	! 				endif
+	! 				! if	iDetail_3d = DETAIL_3D_MVO	then	
+	! 				! 	success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "MVO_iDetail_3d_"+_stNum, iDetail_3d_temp)
+	! 				! 	iDetail_3d = iDetail_3d_temp
+	! 				! endif
+	! 			endif
+	! 		endif
+	! 	endif
+
+	iDetail_total = iDetail_2d				!	2D 스케일을 따름 (3D 스케일 설정은 잠금)
+	iDetail_3d = iDetail_2d					
+
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------
+	!	창호 연산
+	!---------------------------------------------------------------------------------------------------
+	if	GLOB_MODPAR_NAME = "mWidth_1" | GLOB_MODPAR_NAME = "mHeight_1" \
+		| GLOB_MODPAR_NAME = "mWidth_2" | GLOB_MODPAR_NAME = "mHeight_2" \
+		| GLOB_MODPAR_NAME = "mWidth_3" | GLOB_MODPAR_NAME = "mHeight_3" \
+		| GLOB_MODPAR_NAME = "iDim" \
+		| GLOB_MODPAR_NAME = "iDetail_2d" \
+		| GLOB_MODPAR_NAME = "bDis" \
+		| GLOB_MODPAR_NAME = "mDis" | GLOB_MODPAR_NAME = "mDis_L" | GLOB_MODPAR_NAME = "mDis_R" \
+		| GLOB_MODPAR_NAME = "mDis_T" | GLOB_MODPAR_NAME = "mDis_B"		then
+		_bFrame_size_calc = 1
+	else
+		_bFrame_size_calc = 0
+	endif
+
+
+	!	창호 깊이
+	!---------------------------------------------------------------------------------------------------
+	if	iFrame_setting = FRAME_SIZE_ONCE	then
+		mDepth = mFrame_once_d
+	endif
+	if	iFrame_setting = FRAME_SIZE_VERTHORI	then
+		mDepth = mFrame_vert_d
+	endif
+	if	iFrame_setting = FRAME_SIZE_INOUT	then
+		mDepth = mFrame_vert_d
+	endif
+	
+
+	!	창호 치수
+	!---------------------------------------------------------------------------------------------------
+	mWidth_frame = 0
+	mHeight_frame = 0
+	mWidth_opening = 0
+	mHeight_opening = 0
+
+	!	SIMPLE
+	!	- frame : 선택한 치수를 따라 창호 사이즈가 결정된다.
+	!	- opening : 프레임 사이즈와 동일하다.
+	if	(iDetail_total = DETAIL_2D_SIMPLE | iDetail_total = DETAIL_2D_OFF)	then
+		if	iDim = DIM1 	then
+			mWidth_frame = mWidth_1
+			mHeight_frame = mHeight_1
+		endif 
+		if	iDim = DIM2 	then
+			mWidth_frame = mWidth_2
+			mHeight_frame = mHeight_2
+		endif
+		if	iDim = DIM3 	then
+			mWidth_frame = mWidth_3
+			mHeight_frame = mHeight_3
+		endif
+
+		mWidth_opening = mWidth_frame
+		mHeight_opening = mHeight_frame
+	endif
+
+	!	DETAIL
+	!	- frame : 제작치수를 따라 창호 사이즈가 결정된다.
+	!	- opening : 개구부치수를 따라 오프닝 사이즈가 결정된다.
+	if	iDetail_total = DETAIL_2D_DETAIL		then
+		mWidth_frame = mWidth_1
+		mHeight_frame = mHeight_1
+		mWidth_opening = mWidth_3
+		mHeight_opening = mHeight_3		
+	endif	
+
+	mWidth = mWidth_frame
+	mHeight = mHeight_frame
+	A = mWidth_frame
+	B = mHeight_frame
+
+
+	!--------------------------------------------------------------------------------------------------------------
+	!	시스템창호의 경우 Parameters 스크립트 연산이 많으므로, 2D/3D 표현 구분이 힘듬 -> 우선 단일표현으로 변경
+	! !	SIMPLE
+	! !	- frame : 선택한 치수를 따라 창호 사이즈가 결정된다.
+	! !	- opening : 프레임 사이즈와 동일하다.
+	! if	(GLOB_SCRIPT_TYPE <> 3 & (iDetail_2d = DETAIL_2D_SIMPLE | iDetail_2d = DETAIL_2D_OFF)) \
+	! 	| (GLOB_SCRIPT_TYPE <> 2 & (iDetail_3d = DETAIL_3D_SIMPLE | iDetail_3d = DETAIL_3D_OFF))	then
+	! 	if	iDim = DIM1 	then
+	! 		mWidth_frame = mWidth_1
+	! 		mHeight_frame = mHeight_1
+	! 	endif 
+	! 	if	iDim = DIM2 	then
+	! 		mWidth_frame = mWidth_2
+	! 		mHeight_frame = mHeight_2
+	! 	endif
+	! 	if	iDim = DIM3 	then
+	! 		mWidth_frame = mWidth_3
+	! 		mHeight_frame = mHeight_3
+	! 	endif
+
+	! 	mWidth_opening = mWidth_frame
+	! 	mHeight_opening = mHeight_frame
+	! endif
+
+	! !	DETAIL
+	! !	- frame : 제작치수를 따라 창호 사이즈가 결정된다.
+	! !	- opening : 개구부치수를 따라 오프닝 사이즈가 결정된다.
+	! if	(GLOB_SCRIPT_TYPE <> 3 & iDetail_2d = DETAIL_2D_DETAIL) \
+	! 	| (GLOB_SCRIPT_TYPE <> 2 & iDetail_3d = DETAIL_3D_DETAIL)	then
+	! 	mWidth_frame = mWidth_1
+	! 	mHeight_frame = mHeight_1
+	! 	mWidth_opening = mWidth_3
+	! 	mHeight_opening = mHeight_3		
+	! endif	
+
+	! mWidth = mWidth_frame
+	! mHeight = mHeight_frame
+	!--------------------------------------------------------------------------------------------------------------
+
+

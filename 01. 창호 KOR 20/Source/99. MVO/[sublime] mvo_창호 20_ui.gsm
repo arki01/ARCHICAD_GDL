@@ -1,0 +1,216 @@
+
+!======================================================================================================
+!	창호 20 MVO
+!======================================================================================================
+!   DATE : 2017/10/25 WED
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	GUI
+!----------------------------------------------------------------------------------------------------
+
+	! UI Size
+	UI_max_width = 600
+	UI_max_height = 266
+	!  - Width : 444px
+	!  - Height : 296px
+
+	startX = 10
+	startY = 5
+	spaceY_title = 24			!	타이틀 간의 간격
+	spaceY_list = 22			!	항목간의 간격
+
+	separator_posY = 121		!	분리자 위치
+
+
+	ui_dialog	"2D/3D 표현 설정 (창호 20)"
+		ui_page	1
+
+		posX = startX
+		posY = startY
+		posX_list = startX+10
+		posX_2 = UI_max_width/2+10
+		posX_list_2 = posX_2 + 10
+
+			!	2D / 3D 표현 
+			!-----------------------------------------------------------------
+			ui_style 	0,	1
+			ui_outfield	"2D / 3D 표현",	posX, posY	
+			posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"설정 방식",	posX_list, posY
+				list_num = 2
+				ui_infield "iDetail_setting", posX_list+60, posY-3, 100, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							SETTING_ALL, stDetail_setting[SETTING_ALL], 
+							SETTING_SCALE, stDetail_setting[SETTING_SCALE]
+				posY = posY + spaceY_list
+
+
+				!	일괄 설정
+				!-----------------------------------------------------------------
+				if	iDetail_setting = SETTING_ALL	then
+					ui_style 	0,	0
+					ui_outfield	"2D 표현",	posX_list, posY
+					ui_infield "MVO_iDetail_2d", posX_list+60, posY-3, 100, 20 
+					posY = posY + spaceY_list
+
+					ui_style 	0,	0
+					ui_outfield	"3D 표현",	posX_list, posY
+					ui_infield "MVO_iDetail_3d", posX_list+60, posY-3, 100, 20
+					posY = posY + spaceY_title
+				endif
+
+		
+				!	스케일별 설정
+				!-----------------------------------------------------------------
+				if	iDetail_setting = SETTING_SCALE	then
+					posY = posY - spaceY_list 
+					ui_style 	0,	0
+					ui_outfield	"( 스케일 설정 수 : ",	posX_list+170, posY
+					ui_infield "iDetail_scale_num", 	posX_list+170+100, posY-4, 40, 20 
+					ui_outfield	")",					posX_list+170+100+45, posY
+					posY = posY + spaceY_title 
+					posy_temp = posY							!	시작위치 저장
+
+					gosub	"Detail_setting_1"
+					posy_temp_end = posY						!	끝 위치 저장
+					posY = posY + spaceY_list
+
+					ui_separator	UI_max_width/2, posy_temp, UI_max_width/2, posy_temp_end
+
+					if	iDetail_scale_num > 4	then
+						posY = posy_temp						
+						gosub	"Detail_setting_2"
+						posY = posy_temp_end
+					endif
+
+				endif
+
+			posY = posY + 5
+
+
+			!	열림선
+			!-----------------------------------------------------------------
+			posy_temp = posY
+
+			ui_style 	0,	1
+			ui_outfield	"열림선",	posX, posY	
+			posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"2D 열림 표현",	posX_list, posY
+				list_num = 2
+				ui_infield "iLine_show_2d", posX_list+70, posY-3, 80, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							LINE_SHOW, stLine_show[LINE_SHOW], 
+							LINE_HIDE, stLine_show[LINE_HIDE]
+				posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"3D 열림 표현",	posX_list, posY
+				list_num = 2
+				ui_infield "iLine_show_3d", posX_list+70, posY-3, 80, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							LINE_SHOW, stLine_show[LINE_SHOW], 
+							LINE_HIDE, stLine_show[LINE_HIDE]
+
+
+			!	마커
+			!-----------------------------------------------------------------
+			posY = posy_temp
+
+			ui_style 	0,	1
+			ui_outfield	"마커 표시 (창호 마커 20.gsm)",	posX_2, posY, 150, 20	
+			posY = posY + spaceY_list
+
+				ui_style 	0,	0
+				ui_outfield	"2D 열림 표현",	posX_list_2, posY
+				list_num = 2
+				ui_infield "iMarker_show", posX_list_2+70, posY-3, 80, 20, 
+							8, "", list_num, 0, 
+							0, 0, 0, 0, 
+							MARKER_SHOW, stMarker_show[MARKER_SHOW], 
+							MARKER_HIDE, stMarker_show[MARKER_HIDE]
+				posY = posY + spaceY_list
+
+
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+"Detail_setting_1"	:
+
+	ui_style 	0,	0
+	ui_outfield	"스케일",	posX_list+25, posY
+	ui_outfield	"2D 표현",	posX_list+25+50, posY
+	ui_outfield	"3D 표현",	posX_list+25+50+100, posY
+	posY = posY + spaceY_list
+
+	for i = 1	to	min(iDetail_scale_num,5)
+		idx = i
+		posx_sub = posX_list
+		gosub	"Detail_setting_contents"
+		posY = posY + spaceY_list
+	next i
+
+	if	iDetail_scale_num < 5	then
+		idx = iDetail_scale_num+1
+		posx_sub = posX_list
+		gosub	"Detail_setting_contents"
+		posY = posY + spaceY_list
+	endif
+
+return
+
+
+"Detail_setting_2"	:
+
+	ui_style 	0,	0
+	ui_outfield	"스케일",	posX_list_2+25, posY
+	ui_outfield	"2D 표현",	posX_list_2+25+50, posY
+	ui_outfield	"3D 표현",	posX_list_2+25+50+100, posY
+	posY = posY + spaceY_list
+
+	if	iDetail_scale_num > 5	then
+		for i = 6	to	iDetail_scale_num
+			idx = i
+			posx_sub = posX_list_2
+			gosub	"Detail_setting_contents"
+			posY = posY + spaceY_list
+		next i
+	endif
+
+	idx = iDetail_scale_num+1
+	posx_sub = posX_list_2
+	gosub	"Detail_setting_contents"
+	posY = posY + spaceY_list
+
+return
+
+
+"Detail_setting_contents"	:
+
+	num = str(idx,1,0)
+	ui_style 	0,	0
+	ui_outfield	num,		 			posx_sub, posY
+	ui_outfield	"1:",		 			posx_sub+15, posY		
+	if	idx <= iDetail_scale_num	then
+		ui_infield "iScale_"+num, 			posx_sub+15+10, posY-3, 40, 20 
+	else
+		ui_outfield "기타", 			posx_sub+15+10, posY
+	endif	
+	ui_infield "MVO_iDetail_2d_"+num, 	posx_sub+15+10+50, posY-3, 90, 20 
+	ui_infield "MVO_iDetail_3d_"+num, 	posx_sub+15+10+50+100, posY-3, 90, 20 
+
+return

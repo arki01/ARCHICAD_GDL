@@ -1,0 +1,341 @@
+
+
+!======================================================================================================
+!	창호 20 - 마감
+!======================================================================================================
+!	DATE : 2017/8/31 THU
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	매크로 연동
+!----------------------------------------------------------------------------------------------------
+
+
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+if	iFin_num = 0 then
+	parameters	bClosure = bClosure
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 정의
+!----------------------------------------------------------------------------------------------------
+values{2}	"iClosure_type",
+			TYPE1, stClosure_type_arr[TYPE1],
+			TYPE2, stClosure_type_arr[TYPE2],
+			TYPE3, stClosure_type_arr[TYPE3]
+
+values{2}	"iDim",
+			DIM1, stDim[DIM1],
+			DIM2, stDim[DIM2],
+			DIM3, stDim[DIM3]
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 범위 정의
+!----------------------------------------------------------------------------------------------------				
+	!	치수
+	!----------------------------------------------------------------------------------------------------
+	values	"mWidth_1"	range	[0.100, ]
+	values	"mWidth_2"	range	[0.100+mDis_width/2, ]
+	values	"mWidth_3"	range	[0.100+mDis_width, ]
+	values	"mHeight_1"	range	[0.100, ]
+	values	"mHeight_2"	range	[0.100+mDis_height/2, ]
+	values	"mHeight_3"	range	[0.100+mDis_height, ]
+
+	values	"mDis"		range	[0, 0.100]
+	values	"mDis_L"	range	[0, 0.100]
+	values	"mDis_R"	range	[0, 0.100]
+	values	"mDis_T"	range	[0, 0.100]
+	values	"mDis_B"	range	[0, 0.100]
+
+
+	!	마감 회전 수 
+	!----------------------------------------------------------------------------------------------------
+	if	bFin_front	then
+		values	"iClosure_num"		range [0, min(abs(mFin_front_idx1-mFin_front_idx2)+1, 3)]
+	else
+		values	"iClosure_num"		range [0, 0]
+	endif
+	if	bFin_end	then
+		values	"iClosure_num_in"	range [0, min(abs(mFin_end_idx1-mFin_end_idx2)+1, 3)]
+	else
+		values	"iClosure_num_in"		range [0, 0]
+	endif
+
+	!	마감 오프셋 
+	!----------------------------------------------------------------------------------------------------
+	if	mClosure_stretch < EPS | iClosure_type = TYPE2	then
+		mMin = mClosure_thk-mFin_front_thk_real
+		mMax = mClosure_thk-mFin_front_thk_real + min(mWidth/2,mHeight/2)-0.010
+	else
+		if	not(bClosure_ex)	then
+			mMin = mClosure_thk
+			mMax = mClosure_thk-mFin_front_thk_real + min(mWidth/2,mHeight/2)-0.010
+		else
+			mMin = mClosure_thk - mFin_thk_arr[mFin_front_idx1] + mClosure_ex_thk
+			mMax = mClosure_thk-mFin_front_thk_real + min(mWidth/2,mHeight/2)-0.010
+		endif	
+	endif
+	values	"mClosure_offset"		range [mMin, mMax]
+
+	if	mClosure_stretch_in < EPS | iClosure_type = TYPE2	then
+		mMin = mClosure_thk-mFin_end_thk_real
+		mMax = mClosure_thk-mFin_end_thk_real + min(mWidth/2,mHeight/2)-0.010
+	else
+		if	not(bClosure_ex)	then
+			mMin = mClosure_thk
+			mMax = mClosure_thk-mFin_end_thk_real + min(mWidth/2,mHeight/2)-0.010
+		else
+			mMin = mClosure_thk - mFin_thk_arr[mFin_end_idx2] + mClosure_ex_thk
+			mMax = mClosure_thk-mFin_end_thk_real + min(mWidth/2,mHeight/2)-0.010
+		endif	
+	endif
+	values	"mClosure_offset_in"		range [mMin, mMax]
+
+
+	!	마감 연장
+	!----------------------------------------------------------------------------------------------------
+	if	iClosure_type = TYPE3	then
+		mMax = mWall_thk - mFin_front_thk
+		values	"mClosure_stretch"		range [0, mMax]
+		mMax = mWall_thk - mFin_end_thk
+		values	"mClosure_stretch_in"	range [0, mMax]		
+	else
+		values	"mClosure_stretch"		range [0, ]
+		values	"mClosure_stretch_in"		range [0, ]
+	endif
+
+
+		
+	!	별도 마감
+	!----------------------------------------------------------------------------------------------------
+	values	"mClosure_ex_thk"	range (0, ]
+
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 잠금/숨기기
+!----------------------------------------------------------------------------------------------------		
+if	bClosure	then
+	lock	"mClosure_thk"
+
+	!	별도 외부마감
+	if	not(bClosure_ex)	then
+		hideparameter	"mClosure_ex_thk", "iClosure_ex_mat", "iClosure_ex_fill", "iClosure_ex_fill_pen", "iClosure_ex_back_pen"
+		lock	"mClosure_ex_thk"
+	endif
+
+	!	마감 회전 수 
+	if	not(bFin_front)	then	lock	"iClosure_num"
+	if	not(bFin_end)	then	lock	"iClosure_num_in"
+else
+	lock			"mClosure_thk", "iClosure_type", "iClosure_num", "iClosure_num_in", "bClosure_ex", "mClosure_ex_thk", "iClosure_ex_mat", "iClosure_ex_fill", "iClosure_ex_fill_pen", "iClosure_ex_back_pen", "iClosure_pen"
+	hideparameter	"mClosure_thk", "iClosure_type", "iClosure_num", "iClosure_num_in", "bClosure_ex", "mClosure_ex_thk", "iClosure_ex_mat", "iClosure_ex_fill", "iClosure_ex_fill_pen", "iClosure_ex_back_pen", "iClosure_pen"
+endif
+
+if	iFin_num = 0	then
+	lock	"bClosure"
+endif
+
+if	bDis	then
+	lock	"mDis_L", "mDis_R", "mDis_T", "mDis_B"
+else
+	lock	"mDis"
+endif
+
+if	iDim = DIM1 	then
+	lock	"mWidth_2", "mWidth_3", "mHeight_2", "mHeight_3"
+endif
+if	iDim = DIM2 	then
+	lock	"mWidth_1", "mWidth_3", "mHeight_1", "mHeight_3"
+endif
+if	iDim = DIM3 	then
+	lock	"mWidth_2", "mWidth_1", "mHeight_2", "mHeight_1"
+endif
+
+lock	"mWidth", "mHeight"
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------
+
+	!	마감
+	!----------------------------------------------------------------------------------------------------
+	if	bClosure	then
+
+		!	마감 타입에 따른 마감 회전 수
+		!----------------------------------------------------------------------------------------------------
+		!	타입2 경우에는 한쪽 마감 회전 수가 1개 이상일 경우 반대쪽은 0개
+		if	iClosure_type = TYPE2	then
+			if	GLOB_MODPAR_NAME = "iClosure_type" | GLOB_MODPAR_NAME = "iClosure_num" | GLOB_MODPAR_NAME = "iClosure_num_in"	then
+				if	GLOB_MODPAR_NAME = "iClosure_type"	then
+					iClosure_num = 1
+					iClosure_num_in = 0
+				endif
+				if	GLOB_MODPAR_NAME = "iClosure_num"	then
+					if	iClosure_num >= 1	then
+						iClosure_num_in = 0
+					endif
+				endif
+				if	GLOB_MODPAR_NAME = "iClosure_num_in"	then
+					if	iClosure_num_in >= 1	then
+						iClosure_num = 0
+					endif
+				endif
+				parameters iClosure_num = iClosure_num
+				parameters iClosure_num_in = iClosure_num_in
+			endif
+		endif
+
+
+		!	마감 타입에 따른 오프셋값, 연장값
+		!----------------------------------------------------------------------------------------------------
+		if	GLOB_MODPAR_NAME = "iClosure_type" | GLOB_MODPAR_NAME = "iClosure_num" | GLOB_MODPAR_NAME = "iClosure_num_in"  then
+			
+			!	타입 1
+			!	오프셋 : 개구부 높이만큼 자동 오프셋
+			!	연장 : 0		
+			if	iClosure_type = TYPE1	then
+				parameters	mClosure_offset = mClosure_offset
+				parameters	mClosure_offset_in = mClosure_offset_in
+				parameters	mClosure_stretch = mClosure_stretch
+				parameters	mClosure_stretch_in = mClosure_stretch_in			
+			endif
+
+			!	타입 2
+			!	오프셋 : 개구부 높이와 마감회전 두께만큼 오프셋
+			!	연장 : 벽두께만큼 연장
+			if	iClosure_type = TYPE2	then
+				parameters	mClosure_offset = mClosure_offset
+				parameters	mClosure_offset_in = mClosure_offset_in
+				parameters	mClosure_stretch = mClosure_stretch
+				parameters	mClosure_stretch_in = mClosure_stretch_in			
+			endif
+
+			!	타입 3
+			!	오프셋 : 개구부 높이와 마감회전 두께만큼 오프셋
+			!	연장 : 0
+			if	iClosure_type = TYPE3	then
+				if	GLOB_MODPAR_NAME = "iClosure_type" | GLOB_MODPAR_NAME = "iClosure_num" | GLOB_MODPAR_NAME = "iClosure_num_in"  then
+					parameters	mClosure_offset = mClosure_offset
+					parameters	mClosure_offset_in = mClosure_offset_in			
+					parameters	mClosure_stretch = mClosure_stretch
+					parameters	mClosure_stretch_in = mClosure_stretch_in		
+				endif	
+			endif
+
+		endif
+
+	endif
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	값 입력
+!----------------------------------------------------------------------------------------------------
+	!	마감
+	!----------------------------------------------------------------------------------------------------
+	if	bClosure	then
+		parameters	mClosure_thk = mClosure_thk
+	endif
+
+	if	bDis	then
+		mDis_L = mDis
+		mDis_R = mDis
+		mDis_T = mDis
+		mDis_B = mDis
+		parameters	mDis_L = mDis_L,
+					mDis_R = mDis_R,
+					mDis_T = mDis_T,
+					mDis_B = mDis_B
+	endif
+
+	!	치수 연동
+	!----------------------------------------------------------------------------------------------------
+		!	공통 
+		!----------------------------------------------------------------------------------------------------
+		parameters	mWidth = mWidth
+		parameters	mHeight = mHeight
+
+		!	A,B 수정시
+		!----------------------------------------------------------------------------------------------------
+		if	GLOB_MODPAR_NAME = "A"	then
+			if	iDim = DIM1 then parameters	mWidth_1 = mWidth_1
+			if	iDim = DIM2 then parameters mWidth_2 = mWidth_2
+			if	iDim = DIM3 then parameters mWidth_3 = mWidth_3
+		endif
+		if	GLOB_MODPAR_NAME = "B"	then
+			if	iDim = DIM1 then parameters mHeight_1 = mHeight_1
+			if	iDim = DIM2 then parameters mHeight_2 = mHeight_2
+			if	iDim = DIM3 then parameters mHeight_3 = mHeight_3
+		endif	
+
+		!	세부치수 인덱스 변경시
+		!----------------------------------------------------------------------------------------------------
+		if	GLOB_MODPAR_NAME = "iDim"	then
+			if	iDim = DIM1 then parameters	A = A
+			if	iDim = DIM2 then parameters	A = A	
+			if	iDim = DIM3 then parameters	A = A	
+			if	iDim = DIM1 then parameters	B = B	
+			if	iDim = DIM2 then parameters	B = B
+			if	iDim = DIM3 then parameters	B = B
+		endif
+
+		!	세부치수 수정시
+		!----------------------------------------------------------------------------------------------------
+		if	iDim = DIM1 	then
+			if	GLOB_MODPAR_NAME = "mWidth_1" 		then 	parameters	A = A
+			if	GLOB_MODPAR_NAME = "mHeight_1"  	then	parameters	B = B
+		endif 
+		if	iDim = DIM2 	then
+			if	GLOB_MODPAR_NAME = "mWidth_2" 		then 	parameters	A = A
+			if	GLOB_MODPAR_NAME = "mHeight_2"  	then	parameters	B = B
+		endif
+		if	iDim = DIM3 	then
+			if	GLOB_MODPAR_NAME = "mWidth_3" 		then 	parameters	A = A
+			if	GLOB_MODPAR_NAME = "mHeight_3"  	then	parameters	B = B
+		endif	
+
+		if	iDim = DIM1 	then
+			if	GLOB_MODPAR_NAME = "mWidth_1" | _bCalc	then
+				parameters	mWidth_2 = mWidth_2
+				parameters	mWidth_3 = mWidth_3
+			endif
+			if	GLOB_MODPAR_NAME = "mHeight_1" | _bCalc 	then
+				parameters	mHeight_2 = mHeight_2
+				parameters	mHeight_3 = mHeight_3		
+			endif
+		endif 
+		if	iDim = DIM2 	then
+			if	GLOB_MODPAR_NAME = "mWidth_2" | _bCalc	then
+				parameters	mWidth_1 = mWidth_1
+				parameters	mWidth_3 = mWidth_3		
+			endif
+			if	GLOB_MODPAR_NAME = "mHeight_2" | _bCalc	then
+				parameters	mHeight_1 = mHeight_1
+				parameters	mHeight_3 = mHeight_3		
+			endif
+		endif
+		if	iDim = DIM3 	then
+			if	GLOB_MODPAR_NAME = "mWidth_3" | _bCalc	then
+				parameters	mWidth_1 = mWidth_1
+				parameters	mWidth_2 = mWidth_2		
+			endif
+			if	GLOB_MODPAR_NAME = "mHeight_3" | _bCalc	then
+				parameters	mHeight_1 = mHeight_1
+				parameters	mHeight_2 = mHeight_2		
+			endif
+		endif
+	

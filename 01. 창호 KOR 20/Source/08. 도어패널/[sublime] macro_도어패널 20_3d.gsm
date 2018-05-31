@@ -1,0 +1,173 @@
+
+!======================================================================================================
+!	창호 20 - 도어패널(Sub)
+!======================================================================================================
+!   DATE : 2018/01/18 THU
+!   VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+mTextH = 50
+define style "style_test_3d"	"맑은 고딕", mTextH, 1, 0
+set style	"style_test_3d"
+
+if	bTest	then
+	if	GLOB_VIEW_TYPE = 3	then
+		! text		 0.001, 0, stMyname
+	endif
+endif
+
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+
+
+!----------------------------------------------------------------------------------------------------
+!	형상
+!----------------------------------------------------------------------------------------------------
+resol iResol
+pen	iSash_pen
+
+rotz	-rDoor_ang_3d
+
+	!	핫스팟
+	!----------------------------------------------------------------------------------------------------
+	! unID = 1000
+	! hotspot	0, 0, 0, 			unID	: unID = unID + 1
+	! hotspot	mWidth, 0, 0, 		unID	: unID = unID + 1	
+	! hotspot	mWidth, 0, mHeight, 	unID	: unID = unID + 1
+	! hotspot	0, 0, mHeight,		unID	: unID = unID + 1
+
+
+	!	패널
+	!----------------------------------------------------------------------------------------------------
+	!	방화문
+	if	iDoor_leaftype = DOORLEAF_GENERAL	then			gosub	"doorleaf_general"
+	if	iDoor_leaftype = DOORLEAF_GLASS_2SIDE_FRAME	then	gosub	"doorleaf_glass_2side_frame"
+	if	iDoor_leaftype = DOORLEAF_GLASS_4SIDE_FRAME	then	gosub	"doorleaf_glass_4side_frame"
+
+
+del	1
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+!---------------------------------------------------------------------------------
+"doorleaf_general"	:
+!---------------------------------------------------------------------------------
+
+	material iDoor_mat
+	sect_fill	iSash_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iSash_sect_pen
+
+	si = 1+2+4+8
+	put	0, 0, si,
+		mWidth, 0, si,
+		mWidth, mHeight, si,
+		0, mHeight, si,
+		0, 0, -1
+
+	addy	mThick
+		rotx	90
+			prism_	nsp/3, mThick,
+					get(nsp)
+		del	1
+	del	1
+
+return
+
+
+!---------------------------------------------------------------------------------
+"doorleaf_glass_4side_frame"	:
+!---------------------------------------------------------------------------------
+
+	!	프레임
+	material iDoor_mat
+	sect_fill	iSash_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iSash_sect_pen
+
+	si = 1+2+4+8
+	put	0, 0, si,
+		mWidth, 0, si,
+		mWidth, mHeight, si,
+		0, mHeight, si,
+		0, 0, -1,
+
+		mDoor_frame_w, mDoor_frame_w, si,
+		mWidth - mDoor_frame_w, mDoor_frame_w, si,
+		mWidth - mDoor_frame_w, mHeight - mDoor_frame_w, si,
+		mDoor_frame_w, mHeight - mDoor_frame_w, si,
+		mDoor_frame_w, mDoor_frame_w, -1
+
+	addy	mThick
+		rotx	90
+			prism_	nsp/3, mThick,
+					get(nsp)
+		del	1
+	del	1
+
+	!	유리 
+	material iGlass_mat
+	sect_fill	iGlass_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iGlass_sect_pen
+	addy	mThick/2 - mDoor_glass_thk/2
+	addz	mDoor_frame_w
+		addx	mDoor_frame_w			
+			block	mWidth - mDoor_frame_w*2, mDoor_glass_thk, mHeight - mDoor_frame_w*2 
+		del	1
+	del	1
+	del	1
+
+return
+
+
+
+!---------------------------------------------------------------------------------
+"doorleaf_glass_2side_frame"	:
+!---------------------------------------------------------------------------------
+
+	!	프레임
+	material iDoor_mat
+	sect_fill	iSash_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iSash_sect_pen
+
+	si = 1+2+4+8
+	put	0, 0, si,
+		mWidth, 0, si,
+		mWidth, mDoor_frame_w, si,
+		0, mDoor_frame_w, si,
+		0, 0, -1
+
+	addy	mThick
+		rotx	90
+			prism_	nsp/3, mThick,
+					use(nsp)
+		del	1
+		addz	mHeight - mDoor_frame_w
+			rotx	90
+				prism_	nsp/3, mThick,
+						get(nsp)
+			del	1	
+		del	1	
+	del	1
+
+	!	유리 
+	material iGlass_mat
+	sect_fill	iGlass_sect_fill, iSash_sect_back_pen, iSash_sect_fill_pen, iGlass_sect_pen
+	addy	mThick/2 - mDoor_glass_thk/2
+	addz	mDoor_frame_w	
+		block	mWidth, mDoor_glass_thk, mHeight - mDoor_frame_w*2 
+	del	1
+	del	1
+
+return
+

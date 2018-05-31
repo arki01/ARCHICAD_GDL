@@ -1,0 +1,710 @@
+
+!======================================================================================================
+!	패널 20
+!======================================================================================================
+!	DATE : 2017/10/19 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+!	원점
+if	bOrigin	then
+	sphere 0.005
+	hotspot	0, 0, 0
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	공통
+!----------------------------------------------------------------------------------------------------
+unID = 2000
+
+_mTextH = 50
+define style "style_test_3d"	"맑은 고딕", _mTextH, 5, 0
+set style	"style_test_3d"
+pen			iSash_pen
+
+	!	열림선
+	!----------------------------------------------------------------------------------------------------
+	bLine_2d = 0
+	bLine_3d = 0
+	if	iLine_show_2d = LINE_MVO	then	
+		iLine_show_2d_temp = 0
+		success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iLine_show_2d", iLine_show_2d_temp)
+		iLine_show_2d = iLine_show_2d_temp
+	endif
+	if	iLine_show_2d = LINE_SHOW	then	bLine_2d = 1
+	if	iLine_show_2d = LINE_HIDE	then	bLine_2d = 0
+
+	if	iLine_show_3d = LINE_MVO	then	
+		iLine_show_3d_temp = 0
+		success = LIBRARYGLOBAL ("mvo_창호 20.gsm", "iLine_show_3d", iLine_show_3d_temp)
+		iLine_show_3d = iLine_show_3d_temp
+	endif			
+	if	iLine_show_3d = LINE_SHOW	then	bLine_3d = 1
+	if	iLine_show_3d = LINE_HIDE	then	bLine_3d = 0
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	형상
+!----------------------------------------------------------------------------------------------------
+	!	핫스팟
+	!----------------------------------------------------------------------------------------------------
+	if	bTest	then
+		unID = 1000
+		hotspot	0, 0, 0, 				unID	: unID = unID + 1
+		hotspot	mWidth, 0, 0, 			unID	: unID = unID + 1	
+		hotspot	mWidth, 0, mHeight, 	unID	: unID = unID + 1
+		hotspot	0, 0, mHeight,			unID	: unID = unID + 1
+	endif
+
+
+	!	샤시
+	!----------------------------------------------------------------------------------------------------
+	if	iPanel_type = SASH_TYPE	then
+		
+		!	단순 표현
+		!----------------------------------------------------------------------------------------------------
+		if	iDetail_3d = DETAIL_3D_SIMPLE | iDetail_3d = DETAIL_3D_DETAIL	then
+
+			!	단일창
+			!----------------------------------------------------------------------------------------------------
+			if	iSash_category = CATEGORY_SINGLE 	then
+				!	3D 열림선 보이기 
+				if	GLOB_VIEW_TYPE = 3 	then
+					bLine_sub = bLine_3d
+				endif
+				!	2D 열림선 보이기
+				if	GLOB_VIEW_TYPE = 4 | GLOB_VIEW_TYPE = 5 	then
+					bLine_sub = bLine_2d
+				endif
+				gosub	"sash_type_shape"
+			endif
+
+			!	이중창
+			!----------------------------------------------------------------------------------------------------
+			if	iSash_category = CATEGORY_DOUBLE	then
+				!	3D 열림선 보이기 
+				if	GLOB_VIEW_TYPE = 3 	then
+					bLine_sub = bLine_3d
+				endif
+				!	2D 열림선 보이기
+				if	GLOB_VIEW_TYPE = 4 | GLOB_VIEW_TYPE = 5 	then
+					bLine_sub = bLine_2d
+				endif
+				gosub	"sash_type_shape"
+
+				if	bCategory_double	then
+					bLine_sub = 0
+					bNet = 0									!	방충망은 첫번째 샤시에서만
+					addy	mSash_thick + mSash_double_dis
+						gosub	"sash_type_shape"
+					del	1
+				endif
+			endif
+
+			!	삼중창
+			!----------------------------------------------------------------------------------------------------
+			if	iSash_category = CATEGORY_TRIPLE	then
+				!	3D 열림선 보이기 
+				if	GLOB_VIEW_TYPE = 3 	then
+					bLine_sub = bLine_3d
+				endif
+				!	2D 열림선 보이기
+				if	GLOB_VIEW_TYPE = 4 | GLOB_VIEW_TYPE = 5 	then
+					bLine_sub = bLine_2d
+				endif
+				gosub	"sash_type_shape"
+
+
+				if	bCategory_double	then
+					bLine_sub = 0
+					bNet = 0									!	방충망은 첫번째 샤시에서만
+					addy	mSash_thick + mSash_double_dis
+						gosub	"sash_type_shape"
+						addy	mSash_thick + mSash_double_dis
+							gosub	"sash_type_shape"
+						del	1
+					del	1
+				endif
+			endif
+
+		endif
+
+		! !	상세 표현
+		! !----------------------------------------------------------------------------------------------------
+		! if	iDetail_3d = DETAIL_3D_DETAIL	then
+
+		! endif
+
+	endif
+
+
+	!	도어
+	!----------------------------------------------------------------------------------------------------
+	if	iPanel_type = DOOR_TYPE	then
+
+		!	단순 표현
+		!----------------------------------------------------------------------------------------------------
+		if	iDetail_3d = DETAIL_3D_SIMPLE | iDetail_3d = DETAIL_3D_DETAIL	then
+
+			!	3D 열림선 보이기 
+			if	GLOB_VIEW_TYPE = 3 	then
+				bLine_sub = bLine_3d
+			endif
+			!	2D 열림선 보이기
+			if	GLOB_VIEW_TYPE = 4 | GLOB_VIEW_TYPE = 5 	then
+				bLine_sub = bLine_2d
+			endif
+			gosub	"door_type_shape"
+
+		endif
+
+		! !	상세 표현
+		! !----------------------------------------------------------------------------------------------------
+		! if	iDetail_3d = DETAIL_3D_DETAIL	then
+
+		! endif
+
+	endif
+
+	!	인덱스 
+	!----------------------------------------------------------------------------------------------------
+	if	bSash_index	then	
+		if	GLOB_VIEW_TYPE <> 2	& GLOB_FEEDBACK_MODE = 0 then
+
+			bMirrored = 0
+			if	abs(SYMB_ROTANGLE-0) < EPS & SYMB_MIRRORED = 0 & 	WIDO_REVEAL_SIDE = 0 \
+				| abs(SYMB_ROTANGLE-180) < EPS & SYMB_MIRRORED = 0 & 	WIDO_REVEAL_SIDE = 0 \
+				| abs(SYMB_ROTANGLE-0) < EPS & SYMB_MIRRORED = 1 & 	WIDO_REVEAL_SIDE = 1 \
+				| abs(SYMB_ROTANGLE-180) < EPS & SYMB_MIRRORED = 1 & 	WIDO_REVEAL_SIDE = 1 then
+				bMirrored = 1
+			endif
+			pen			iSash_pen
+			material	iText_mat
+			addx	mSash_width/2
+				addz	mSash_height/2
+	
+						if	GLOB_CONTEXT = 5 & WIDO_REVEAL_SIDE = 1	then
+							mulx	-1
+						endif	
+						if	bMirrored	then
+							mulx	-1
+						endif
+							rotx	90
+								text	0.001, 0, iSash_idx
+							del	1
+						if	bMirrored	then
+							del	1
+						endif
+						if	GLOB_CONTEXT = 5 & WIDO_REVEAL_SIDE = 1	then
+							del	1
+						endif	
+
+				del	1
+			del	1
+
+		endif
+	endif
+
+
+!======================================================================================================
+end
+!======================================================================================================
+
+
+!---------------------------------------------------------------------------------
+"sash_type_shape"	:
+!---------------------------------------------------------------------------------
+
+	!	고정창
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_FIXED	then
+		mWidth_calc = mSash_width
+		iLine_type_sub = LINE_FIX
+		iLine_shape_type = SHAPE_REAL_LINE
+		call	"macro_샤시패널 20.gsm"	parameters	all	mWidth = mWidth_calc,
+															mHeight = mSash_height,
+															mFrame_w = mSash_frame_w,
+															mFrame_d = mSash_frame_d,
+															mGlass_thk = mSash_glass_thk,
+															iFrame_mat = iSash_frame_mat,
+															iGlass_mat = iSash_glass_mat
+		if	bLine_sub	then
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mSash_height,
+																iLine_type = iLine_type_sub
+		endif
+		mSash_thick = mSash_frame_d
+	endif
+
+	!	여닫이창
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_PROJECT_LEFT | iSash_type = TYPE_PROJECT_RIGHT | iSash_type = TYPE_PROJECT_TOP | iSash_type = TYPE_PROJECT_BOTTOM 	then
+		mWidth_calc = mSash_width
+		iLine_shape_type = SHAPE_REAL_LINE
+		if	iSash_type = TYPE_PROJECT_LEFT		then	iLine_type_sub = LINE_TURN_LEFT
+		if	iSash_type = TYPE_PROJECT_RIGHT		then	iLine_type_sub = LINE_TURN_RIGHT
+		if	iSash_type = TYPE_PROJECT_TOP		then	iLine_type_sub = LINE_TURN_TOP
+		if	iSash_type = TYPE_PROJECT_BOTTOM	then	iLine_type_sub = LINE_TURN_BOTTOM
+		call	"macro_샤시패널 20.gsm"	parameters	all	mWidth = mWidth_calc,
+															mHeight = mSash_height,
+															mFrame_w = mSash_frame_w,
+															mFrame_d = mSash_frame_d,
+															mGlass_thk = mSash_glass_thk,
+															iFrame_mat = iSash_frame_mat,
+															iGlass_mat = iSash_glass_mat
+		if	bLine_sub	then
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mSash_height,
+																iLine_type = iLine_type_sub
+		endif
+		mSash_thick = mSash_frame_d
+	endif
+
+
+	!	쌍여닫이창
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_DOUBLE_PROJECT	then
+		mWidth_calc = mSash_width/2
+		call	"macro_샤시패널 20.gsm"	parameters	all	mWidth = mWidth_calc,
+															mHeight = mSash_height,		
+															mFrame_w = mSash_frame_w,
+															mFrame_d = mSash_frame_d,
+															mGlass_thk = mSash_glass_thk,
+															iFrame_mat = iSash_frame_mat,
+															iGlass_mat = iSash_glass_mat	
+		if	bLine_sub	then
+			iLine_shape_type = SHAPE_REAL_LINE
+			iLine_type_sub = LINE_TURN_LEFT
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mSash_height,
+																iLine_type = iLine_type_sub
+		endif																			
+		addx	mWidth_calc + EPS
+			call	"macro_샤시패널 20.gsm"	parameters	all	mWidth = mWidth_calc,
+																mHeight = mSash_height,
+																mFrame_w = mSash_frame_w,
+																mFrame_d = mSash_frame_d,
+																mGlass_thk = mSash_glass_thk,
+																iFrame_mat = iSash_frame_mat,
+																iGlass_mat = iSash_glass_mat	
+			if	bLine_sub	then
+				iLine_shape_type = SHAPE_REAL_LINE
+				iLine_type_sub = LINE_TURN_RIGHT
+				call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mSash_height,
+																	iLine_type = iLine_type_sub
+			endif																															
+		del	1
+		mSash_thick = mSash_frame_d
+	endif
+
+
+	!	미닫이창(이중)
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_SLIDING_2	then
+
+		!	방충망
+		if	bNet	then
+			if	bSash_dir	then	addx	mSash_width - _mNet_w
+			gosub	"net"
+			if	bSash_dir	then	del	1
+			addy _mNet_frame_d
+		endif
+		
+		!	첫번째 패널
+		mWidth_calc = mSash_width_1 + mSash_frame_w/2
+		if	not(bSash_dir)	then
+			addy	mSash_frame_d + EPS						!	입면선이 보이도록 EPS 추가
+		else
+			addy	0					
+		endif
+			call	"macro_샤시패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+																mHeight = mSash_height,
+																mFrame_w = mSash_frame_w,
+																mFrame_d = mSash_frame_d,
+																mGlass_thk = mSash_glass_thk,
+																iFrame_mat = iSash_frame_mat,
+																iGlass_mat = iSash_glass_mat
+			if	bLine_sub	then
+				iLine_type_sub = LINE_SLIDING_LEFT
+				call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mSash_height,
+																	iLine_type = iLine_type_sub
+			endif																											
+		del	1	
+
+		!	두번째 패널	
+		if	not(bSash_dir)	then
+			add	mWidth_calc - mSash_frame_w, 0, 0
+		else
+			add	mWidth_calc - mSash_frame_w, mSash_frame_d + EPS, 0					
+		endif		
+			mWidth_calc = mSash_width_2 + mSash_frame_w/2
+			call	"macro_샤시패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+																mHeight = mSash_height,		
+																mFrame_w = mSash_frame_w,
+																mFrame_d = mSash_frame_d,
+																mGlass_thk = mSash_glass_thk,
+																iFrame_mat = iSash_frame_mat,
+																iGlass_mat = iSash_glass_mat
+			if	bLine_sub	then
+				iLine_type_sub = LINE_SLIDING_RIGHT
+				call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mSash_height,
+																	iLine_type = iLine_type_sub
+			endif												
+		del	1	
+
+		if	bNet	then
+			del	1	
+		endif
+		mSash_thick = mSash_frame_d*2 + _mNet_frame_d*bNet	
+	endif
+
+
+	!	미닫이창(삼중)
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_SLIDING_3	then
+		
+		!	방충망
+		if	bNet	then
+			if	not(bSash_dir)	then	
+				_mNet_w = _mNet_w_1
+				gosub	"net"
+				addx	mSash_width - _mNet_w_2
+					_mNet_w = _mNet_w_2
+					gosub	"net"
+				del	1
+			else
+				addx	mSash_width_1 - _mNet_frame_w/2
+					_mNet_w = _mNet_w_1
+					gosub	"net"
+				del	1
+			endif
+			addy	_mNet_frame_d
+		endif
+
+
+		!	첫번째 패널
+		mWidth_calc = mSash_width_1 + mSash_frame_w/2
+		if	not(bSash_dir)	then
+			addy	mSash_frame_d + EPS						!	입면선이 보이도록 EPS 추가
+		else
+			addy	0					
+		endif		
+			call	"macro_샤시패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+																mHeight = mSash_height,
+																mFrame_w = mSash_frame_w,
+																mFrame_d = mSash_frame_d,
+																mGlass_thk = mSash_glass_thk,
+																iFrame_mat = iSash_frame_mat,
+																iGlass_mat = iSash_glass_mat
+			if	bLine_sub	then
+				iLine_type_sub = LINE_SLIDING_LEFT
+				call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mSash_height,
+																	iLine_type = iLine_type_sub
+			endif																										
+		del	1	
+
+		!	두번째 패널	
+		if	not(bSash_dir)	then
+			add	mWidth_calc - mSash_frame_w, 0, 0
+		else
+			add	mWidth_calc - mSash_frame_w, mSash_frame_d + EPS, 0					
+		endif		
+			mWidth_calc = mSash_width_3 + mSash_frame_w
+			call	"macro_샤시패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+																mHeight = mSash_height,		
+																mFrame_w = mSash_frame_w,
+																mFrame_d = mSash_frame_d,
+																mGlass_thk = mSash_glass_thk,
+																iFrame_mat = iSash_frame_mat,
+																iGlass_mat = iSash_glass_mat
+			if	bLine_sub	then
+				! iLine_type_sub = LINE_SLIDING_RIGHT
+				! call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+				! 													mLine_height = mSash_height,
+				! 													iLine_type = iLine_type_sub
+			endif																		
+		del	1	
+
+		!	세번째 패널
+		mWidth_calc = mSash_width_2 + mSash_frame_w/2
+		if	not(bSash_dir)	then
+			add(mSash_width_1+mSash_width_3) - mSash_frame_w/2, mSash_frame_d + EPS	, 0
+		else
+			add	(mSash_width_1+mSash_width_3) - mSash_frame_w/2, 0, 0					
+		endif			
+			call	"macro_샤시패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+																mHeight = mSash_height,
+																mFrame_w = mSash_frame_w,
+																mFrame_d = mSash_frame_d,
+																mGlass_thk = mSash_glass_thk,
+																iFrame_mat = iSash_frame_mat,
+																iGlass_mat = iSash_glass_mat
+			if	bLine_sub	then
+				iLine_type_sub = LINE_SLIDING_RIGHT
+				call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mSash_height,
+																	iLine_type = iLine_type_sub
+			endif																									
+		del	1
+
+		if	bNet	then
+			del	1	
+		endif
+		mSash_thick = mSash_frame_d*2 + _mNet_frame_d*bNet	
+	endif
+
+
+	!	프로젝트창
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_PANEL_PROJECT	then
+		mWidth_calc = mSash_width
+		iLine_type_sub = LINE_FIX
+		iLine_shape_type = SHAPE_REAL_LINE
+		call	"macro_샤시패널 20.gsm"	parameters	all	mWidth = mWidth_calc,
+															mHeight = mSash_height,
+															mFrame_w = 0,
+															mFrame_d = mSash_frame_d,
+															mGlass_thk = mSash_glass_thk,
+															iFrame_mat = iSash_frame_mat,
+															iGlass_mat = iSash_glass_mat
+		if	bLine_sub	then
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mSash_height,
+																iLine_type = iLine_type_sub
+		endif
+		mSash_thick = mSash_frame_d		
+	endif
+
+
+	!	스팬드럴
+	!----------------------------------------------------------------------------------------------------
+	if	iSash_type = TYPE_PANEL_SPANDREL	then
+		mWidth_calc = mSash_width
+		iLine_type_sub = LINE_FIX
+		iLine_shape_type = SHAPE_REAL_LINE
+		call	"macro_샤시패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+															mHeight = mSash_height,
+															mFrame_w = 0,
+															mFrame_d = mSash_frame_d,
+															mGlass_thk = mSash_glass_thk,
+															iFrame_mat = iSash_frame_mat,
+															iGlass_mat = iSash_frame_mat
+		if	bLine_sub	then
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mSash_height,
+																iLine_type = iLine_type_sub
+		endif
+		mSash_thick = mSash_frame_d
+	endif
+
+
+return
+
+
+
+!---------------------------------------------------------------------------------
+"door_type_shape"	:
+!---------------------------------------------------------------------------------
+
+	!	여닫이문
+	!----------------------------------------------------------------------------------------------------
+	if	iDoor_type = TYPE_SINGLE_SWING | iDoor_type = TYPE_SINGLE_SWING_180	then
+		mWidth_calc = mDoor_width
+		gosub	"door_panel_singleswing"
+
+		!	핫스팟
+		addz	mDoor_height/2
+			hotspot 	mWidth_calc, 				0, 										0, unID, rDoor_ang_3d, 4+128	: unID = unID + 1			
+			hotspot 	mWidth_calc*cos(rDoor_ang_3d), 	-mWidth_calc*sin(rDoor_ang_3d), 	0, unID, rDoor_ang_3d, 5		: unID = unID + 1	
+			hotspot 	0, 							0, 										0, unID, rDoor_ang_3d, 6		: unID = unID + 1	
+			hotspot 	0, 							0, 										-1, unID, rDoor_ang_3d, 7		: unID = unID + 1	
+		del	1
+	endif
+
+	!	쌍여닫이문
+	!----------------------------------------------------------------------------------------------------
+	if	iDoor_type = TYPE_DOUBLE_SWING | iDoor_type = TYPE_DOUBLE_SWING_180	then
+		mSpace = 0.001
+		mWidth_calc = mDoor_width/2 - mSpace
+		gosub	"door_panel_singleswing"
+													
+		addx	mDoor_width
+		mulx	-1
+			gosub	"door_panel_singleswing"
+		del	1												
+		del	1
+
+		!	핫스팟
+		addz	mDoor_height/2
+			hotspot 	mWidth_calc, 				0, 										0, unID, rDoor_ang_3d, 4+128	: unID = unID + 1			
+			hotspot 	mWidth_calc*cos(rDoor_ang_3d), 	-mWidth_calc*sin(rDoor_ang_3d), 	0, unID, rDoor_ang_3d, 5		: unID = unID + 1	
+			hotspot 	0, 							0, 										0, unID, rDoor_ang_3d, 6		: unID = unID + 1	
+			hotspot 	0, 							0, 										-1, unID, rDoor_ang_3d, 7		: unID = unID + 1	
+		del	1
+	endif	
+
+	!	미닫이문
+	!----------------------------------------------------------------------------------------------------
+	if	iDoor_type = TYPE_SINGLE_SLIDING	then
+		mWidth_calc = mDoor_width/2 + mDoor_frame_w/2
+		gosub	"door_panel_fix"
+													
+		addx	mDoor_width
+		addy	mDoor_thick
+		mulx	-1
+			gosub	"door_panel_sliding"
+		del	1												
+		del	1
+
+		! !	핫스팟
+		! addz	mDoor_height/2
+		! 	hotspot 	0, 				0, 	0, unID, rDoor_ang_3d, 4+128	: unID = unID + 1			
+		! 	hotspot 	mWidth_calc, 	0, 	0, unID, rDoor_ang_3d, 5		: unID = unID + 1	
+		! 	hotspot 	-1, 			0, 	0, unID, rDoor_ang_3d, 6		: unID = unID + 1	
+		! del	1
+	endif	
+
+
+return
+
+
+!---------------------------------------------------------------------------------
+"door_panel_singleswing"	:
+!---------------------------------------------------------------------------------
+!	왼손 열림 기준
+
+	iLine_type_sub = LINE_TURN_LEFT
+	iLine_shape_type = SHAPE_REAL_LINE
+	call	"macro_도어패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+														mHeight = mDoor_height,
+														mThick = mDoor_thick,
+														iGlass_mat = iSash_glass_mat
+
+	if	bLine_sub	then
+		rotz	-rDoor_ang_3d
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mDoor_height,
+																	iLine_type = iLine_type_sub
+			addy	mDoor_thick	
+				call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																	mLine_height = mDoor_height,
+																	iLine_type = iLine_type_sub
+			del	1
+		del	1
+	endif
+
+return
+
+
+!---------------------------------------------------------------------------------
+"door_panel_fix"	:
+!---------------------------------------------------------------------------------
+
+	iLine_type_sub = LINE_FIX
+	iLine_shape_type = SHAPE_REAL_LINE
+	call	"macro_도어패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+														mHeight = mDoor_height,
+														mThick = mDoor_thick,
+														iGlass_mat = iSash_glass_mat,
+														iDoor_leaftype = DOORLEAF_GLASS_4SIDE_FRAME
+
+	if	bLine_sub	then
+		call	"macro_열림선 20.gsm"	parameters	all			mLine_width = mWidth_calc,
+																mLine_height = mDoor_height,
+																iLine_type = iLine_type_sub
+		addy	mDoor_thick	
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mDoor_height,
+																iLine_type = iLine_type_sub
+		del	1
+	endif
+
+return
+
+
+!---------------------------------------------------------------------------------
+"door_panel_sliding"	:
+!---------------------------------------------------------------------------------
+!	왼손 열림 기준
+
+	iLine_type_sub = LINE_SLIDING_LEFT
+	iLine_shape_type = SHAPE_REAL_LINE
+	call	"macro_도어패널 20.gsm"	parameters	all		mWidth = mWidth_calc,
+														mHeight = mDoor_height,
+														mThick = mDoor_thick,
+														iGlass_mat = iSash_glass_mat
+
+	if	bLine_sub	then
+		call	"macro_열림선 20.gsm"	parameters	all			mLine_width = mWidth_calc,
+																mLine_height = mDoor_height,
+																iLine_type = iLine_type_sub
+		addy	mDoor_thick	
+			call	"macro_열림선 20.gsm"	parameters	all		mLine_width = mWidth_calc,
+																mLine_height = mDoor_height,
+																iLine_type = iLine_type_sub
+		del	1
+	endif
+
+return
+
+
+
+
+!---------------------------------------------------------------------------------
+"net"	:
+!---------------------------------------------------------------------------------
+
+	!	프레임 
+	call	"macro_샤시패널 20.gsm"	parameters	all	mWidth = _mNet_w,
+													mHeight = _mNet_h,
+													mFrame_w = _mNet_frame_w,
+													mFrame_d = _mNet_frame_d-0.001,
+													mGlass_thk = 0,
+													iSash_pen = iNet_pen,
+													iSash_sect_pen = iNet_cont_pen,
+													iFrame_mat = iSash_frame_mat
+
+	!	방충망
+	if	GLOB_VIEW_TYPE = 3	then
+		_mNet_dis = 0.015
+	else	
+		_mNet_dis = 0.040
+	endif
+	
+	_iNet_hori = int((_mNet_w-_mNet_frame_w*2)/_mNet_dis)
+	_iNet_vert = int((_mNet_h-_mNet_frame_w*2)/_mNet_dis)
+
+	pen	iNet_pen
+	addy	_mNet_frame_d/2
+
+		!	수직선 
+		addx _mNet_frame_w
+			for idx_hori = 1	to	_iNet_hori
+				addx	_mNet_dis*idx_hori
+					lin_	 0, 0, _mNet_frame_w, 0, 0, _mNet_h-_mNet_frame_w
+				del	1
+			next idx_hori
+		del	1
+
+		!	수평선
+		addz	_mNet_frame_w
+			for idx_vert = 1	to	_iNet_vert
+				addz	_mNet_dis*idx_vert
+					lin_	  _mNet_frame_w, 0, 0, _mNet_w-_mNet_frame_w, 0, 0
+				del	1
+			next idx_vert
+		del	1
+
+	del	1
+
+return

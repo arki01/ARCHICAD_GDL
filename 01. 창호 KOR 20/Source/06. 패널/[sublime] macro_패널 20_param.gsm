@@ -1,0 +1,253 @@
+
+!======================================================================================================
+!	패널 20
+!======================================================================================================
+!	DATE : 2017/10/19 FRI
+!	VER : AC 20
+!	DEV : JO HYUNG JUN
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	매크로 연동
+!----------------------------------------------------------------------------------------------------
+call	"macro_열림선 20.gsm"		parameters	all
+if	bPanel_single then
+	if	iPanel_type = SASH_TYPE 	then	
+		call	"macro_샤시패널 20.gsm"		parameters	all
+	endif
+	if	iPanel_type = DOOR_TYPE		then	
+		call	"macro_도어패널 20.gsm"		parameters	all
+	endif
+else
+	call	"macro_샤시패널 20.gsm"		parameters	all
+	call	"macro_도어패널 20.gsm"		parameters	all
+endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	Test
+!----------------------------------------------------------------------------------------------------
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 정의
+!----------------------------------------------------------------------------------------------------
+	!	패널 순서
+	!------------------------------------------------------------------------------------------------------
+	dim	stSash_index_arr[]
+	for i = 1	to	iSash_num
+		stSash_index_arr[i] = str(i, 1, 0) + "번째"
+	next i
+	values	"stSash_index" 	stSash_index_arr	
+
+	!	패널 타입 구분
+	!------------------------------------------------------------------------------------------------------
+	values{2}	"iPanel_type",
+				SASH_TYPE, stPanel_type[SASH_TYPE],
+				DOOR_TYPE, stPanel_type[DOOR_TYPE]
+
+
+	!	샤시 
+	!------------------------------------------------------------------------------------------------------
+	if	(bPanel_single & iPanel_type = SASH_TYPE) | not(bPanel_single) then
+
+		!	샤시 구분
+		!------------------------------------------------------------------------------------------------------
+		if	bCategory_double	then
+			values{2}	"iSash_category",
+						CATEGORY_SINGLE, stSash_category[CATEGORY_SINGLE],
+						CATEGORY_DOUBLE, stSash_category[CATEGORY_DOUBLE],
+						CATEGORY_TRIPLE, stSash_category[CATEGORY_TRIPLE]
+		else
+			values{2}	"iSash_category",
+						CATEGORY_SINGLE, stSash_category[CATEGORY_SINGLE]
+		endif
+
+
+		!	샤시 유형
+		!------------------------------------------------------------------------------------------------------
+		values{2}	"iSash_type",
+					TYPE_FIXED, stSash_type[TYPE_FIXED],
+					TYPE_PROJECT_LEFT, stSash_type[TYPE_PROJECT_LEFT],
+					TYPE_PROJECT_RIGHT, stSash_type[TYPE_PROJECT_RIGHT],
+					TYPE_PROJECT_TOP, stSash_type[TYPE_PROJECT_TOP],
+					TYPE_PROJECT_BOTTOM, stSash_type[TYPE_PROJECT_BOTTOM],
+					TYPE_DOUBLE_PROJECT, stSash_type[TYPE_DOUBLE_PROJECT],			
+					TYPE_SLIDING_2, stSash_type[TYPE_SLIDING_2],
+					TYPE_SLIDING_3, stSash_type[TYPE_SLIDING_3],
+					TYPE_PANEL_PROJECT, stSash_type[TYPE_PANEL_PROJECT],
+					TYPE_PANEL_SPANDREL, stSash_type[TYPE_PANEL_SPANDREL]
+
+	endif
+
+	!	도어
+	!------------------------------------------------------------------------------------------------------
+	if	iPanel_type = DOOR_TYPE	then
+		if	bPanel_single	then
+			values{2}	"iDoor_type",
+						TYPE_SINGLE_SWING, stDoor_type[TYPE_SINGLE_SWING],
+						TYPE_DOUBLE_SWING, stDoor_type[TYPE_DOUBLE_SWING]
+		else
+			values{2}	"iDoor_type",
+						TYPE_SINGLE_SWING, stDoor_type[TYPE_SINGLE_SWING],
+						TYPE_DOUBLE_SWING, stDoor_type[TYPE_DOUBLE_SWING],
+						TYPE_SINGLE_SWING_180, stDoor_type[TYPE_SINGLE_SWING_180],
+						TYPE_DOUBLE_SWING_180, stDoor_type[TYPE_DOUBLE_SWING_180],
+						TYPE_SINGLE_SLIDING, stDoor_type[TYPE_SINGLE_SLIDING]
+
+			! values{2}	"iDoor_type",
+			! 			TYPE_SINGLE_SWING, stDoor_type[TYPE_SINGLE_SWING],
+			! 			TYPE_DOUBLE_SWING, stDoor_type[TYPE_DOUBLE_SWING],
+			! 			TYPE_SINGLE_POCKET, stDoor_type[TYPE_SINGLE_POCKET],
+			! 			TYPE_DOUBLE_POCKET, stDoor_type[TYPE_DOUBLE_POCKET],
+			! 			TYPE_PIVOT, stDoor_type[TYPE_PIVOT],
+			! 			TYPE_FOLDING_ONEWAY, stDoor_type[TYPE_FOLDING_ONEWAY],
+			! 			TYPE_FOLDING_TWOWAY, stDoor_type[TYPE_FOLDING_TWOWAY],
+			! 			TYPE_ROTATE_4DIV, stDoor_type[TYPE_ROTATE_4DIV],
+			! 			TYPE_ROTATE_3DIV, stDoor_type[TYPE_ROTATE_3DIV],
+			! 			TYPE_ROTATE_2DIV, stDoor_type[TYPE_ROTATE_2DIV]						
+		endif
+	endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 범위 정의
+!----------------------------------------------------------------------------------------------------				
+	!	사이즈
+	!------------------------------------------------------------------------------------------------------
+	mFrame_size_min = 0.005
+	mFrame_size_max = 0.100
+
+	if	(bPanel_single & iPanel_type = SASH_TYPE) | not(bPanel_single) then
+		values	"mSash_frame_w" 	range [mFrame_size_min, mFrame_size_max]
+		values	"mSash_frame_d"	 	range [mFrame_size_min, mFrame_size_max]
+		values	"mSash_glass_thk" 	range (0, 0.100]
+		values	"mSash_glass_dis" 	range (0, 0.100]
+		values	"mSash_double_dis" 	range [0, ]
+		values	"mSash_offset" 		range [0, ]
+	endif
+
+	if	(bPanel_single & iPanel_type = DOOR_TYPE) | not(bPanel_single) then
+		values	"mDoor_width" 	range (0, )
+		values	"mDoor_height" 	range (0, )
+		values	"mDoor_thick" 	range (0, 0.100]
+
+		if	iDoor_type = TYPE_SINGLE_SWING | iDoor_type = TYPE_DOUBLE_SWING	then
+			values	"rDoor_ang_2d" 	range [0, 90]
+			values	"rDoor_ang_3d" 	range [0, 90]
+		endif
+		if	iDoor_type = TYPE_SINGLE_SWING_180 | iDoor_type = TYPE_DOUBLE_SWING_180	then
+			values	"rDoor_ang_2d" 	range [0, 90] , range [270, 360]
+			values	"rDoor_ang_3d" 	range [0, 90] , range [270, 360]
+		endif
+	endif
+
+	! if	iSash_type = TYPE_SLIDING_2 | iSash_type = TYPE_SLIDING_3	then
+	! 	values	"mSash_width_1" 	range (0, mSash_width)
+	! 	values	"mSash_width_2" 	range (0, mSash_width)
+	! 	values	"mSash_width_3" 	range (0, mSash_width)
+	! endif
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 연동
+!----------------------------------------------------------------------------------------------------		
+	!	샤시 너비 세부 설정
+	!------------------------------------------------------------------------------------------------------
+	if	bSash_width_set	then
+		if	iSash_type = TYPE_SLIDING_2	then
+			parameters	mSash_width_2 = mSash_width_2
+		endif
+		if	iSash_type = TYPE_SLIDING_3	then
+			parameters	mSash_width_3 = mSash_width_3
+		endif	
+	else
+		if	iSash_type = TYPE_SLIDING_2	then
+			parameters	mSash_width_1 = mSash_width_1,
+						mSash_width_2 = mSash_width_2
+		endif
+		if	iSash_type = TYPE_SLIDING_3	then
+			parameters	mSash_width_1 = mSash_width_1,
+						mSash_width_2 = mSash_width_2,
+						mSash_width_3 = mSash_width_3
+		endif	
+	endif
+
+	!	2D 표현
+	!------------------------------------------------------------------------------------------------------
+	if	not(bSash_pen_setting)	then
+		parameters 	iSash_cont_pen = iSash_all_pen,
+					iSash_cont_pen_hori = iSash_all_pen,
+					iSash_sect_pen = iSash_all_pen,
+					iSash_pen = iSash_all_pen
+		parameters 	iGlass_cont_pen = iGlass_all_pen,
+					iGlass_sect_pen = iGlass_all_pen			
+	else
+		parameters 	iSash_all_pen = iSash_cont_pen
+		parameters 	iGlass_all_pen = iGlass_cont_pen
+	endif
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	변수 잠금/숨김
+!----------------------------------------------------------------------------------------------------	
+	if	bSash_uniform	then
+		lock	"stSash_index"
+	endif
+
+	if	bPanel_single	then
+		lock	"iSash_index", "stSash_index", "bSash_index", "iPanel_type"
+	endif
+
+	if	not(bPanel_single) | iPanel_type = SASH_TYPE then
+		if	bSash_width_set	then
+			if	iSash_type = TYPE_SLIDING_2	then
+				lock	"mSash_width_2"
+			endif
+			if	iSash_type = TYPE_SLIDING_3	then
+				lock	"mSash_width_3"
+			endif	
+		else
+			lock	"mSash_width_1", "mSash_width_2", "mSash_width_3"
+		endif
+	endif
+
+	!	2D 표현
+	!------------------------------------------------------------------------------------------------------
+	if	bSash_pen_setting	then
+		lock	"iSash_all_pen", "iGlass_all_pen"
+		hideparameter	"iSash_all_pen", "iGlass_all_pen"
+	else
+		lock	"iSash_cont_pen", "iSash_cont_pen_hori", "iSash_sect_pen", "iSash_pen", "iGlass_cont_pen", "iGlass_sect_pen"
+		hideparameter 	"iSash_cont_pen", "iSash_cont_pen_hori", "iSash_sect_pen", "iSash_pen", "iGlass_cont_pen", "iGlass_sect_pen"
+	endif
+
+
+
+!----------------------------------------------------------------------------------------------------
+!	연산
+!----------------------------------------------------------------------------------------------------
+	!	샤시 순서
+	!------------------------------------------------------------------------------------------------------
+	if	not(bPanel_single)	then
+		for i = 1	to	iSash_num
+			if	stSash_index = stSash_index_arr[i]	then
+				iSash_index = i
+				parameters	iSash_index = i
+				i = iSash_num
+			endif
+		next i
+	else
+		iSash_index = 1
+		iSash_num = 1
+		parameters	iSash_index = 1,
+					iSash_num = 1
+	endif
+
+
+
+
+
